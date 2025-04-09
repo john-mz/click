@@ -1,3 +1,9 @@
+<?php
+if (!isset($_GET['view'])) {
+    $_GET['view'] = 'index';
+}
+
+?> 
 <!doctype html>
 <html lang="en">
 
@@ -9,20 +15,25 @@
 </head>
 
 <body>
-    <div class="container">
-        <ul class="nav justify-content-center">
-            <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="index.php">Inicio</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="view/publicacion.php">Crear Publicacion</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link disabled" aria-disabled="true">Usuarios (Solo habilitado pa admins)</a>
-            </li>
-        </ul>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
+
+<div class="container">
+    <ul class="nav justify-content-center">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="index.php">Inicio</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="index.php?view=publicacion">Crear Publicacion</a>
+        </li>
+        <!-- to do: que solo puedan acceder a esto los admins -->
+        <li class="nav-item">
+            <a class="nav-link" href="index.php?view=usuario">Usuarios</a>
+        </li>
+    </ul>
+</div>
+
+<?php require_once 'controller/view.php'; ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
 </body>
 
 </html>
