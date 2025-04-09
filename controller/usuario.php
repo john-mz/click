@@ -20,7 +20,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         $email = $_POST['email'];
         $password = $_POST['password'];
         $rol_id = $_POST['rol'];
-        echo $usuario->insertar($nombre, $email, $password, $rol_id);
+        $usuario->insertar($nombre, $email, $password, $rol_id);
+    }
+
+    if (isset($_POST['eliminar'])){
+        $id_usuario = $_POST['id_usuario'];
+        $usuario->eliminar(($id_usuario));
     }
 
 }

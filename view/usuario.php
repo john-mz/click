@@ -45,6 +45,7 @@ if ($res->num_rows > 0) {
     $fecha = json_encode($row['fecha_registro']);
 ?>
     <button type='button' onclick='editarModal(<?php echo $id_usuario . ", $nombre, $email, $password, $fecha"; ?>)' class='btn btn-warning' data-bs-toggle='modal' data-bs-target='#exampleModal1'>Editar</button>
+    <button type="submit" name="eliminar" class="btn btn-danger">Eliminar</button>
 <?php
     // echo "<a href='index.php?view=usuario&&accion=agregar'>Agregar | </a>";
     // echo "<a href='index.php?view=usuario&&accion=editar&&id_usuario=" . $row['id_usuario'] . "'>Editar | </a>";
