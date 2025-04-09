@@ -13,9 +13,10 @@ class Usuario {
         return $res;
     }
 
-    function insertar($nombre, $email, $password, $fecha_registro, $rol_id){
-        $sql = "INSERT INTO usuario (nombre, email, password, fecha_registro, rol_id) VALUES ('$nombre', '$email, '$password', '$fecha_registro', '$rol_id')";
+    function insertar($nombre, $email, $password, $rol_id){
+        $sql = "INSERT INTO usuario (nombre, email, password, rol_id) VALUES ('$nombre', '$email', '$password', $rol_id)";
         $res = $this->conn->query($sql);
+
     }
 
     function editar($id_usuario, $nombre, $email, $password, $fecha_registro, $rol_id){
