@@ -13,13 +13,19 @@ class Usuario {
         return $res;
     }
 
-    function insertar($nombre, $email, $password, $fecha_registro, $rol_id){
-        $sql = "INSERT INTO usuario (nombre, email, password, fecha_registro, rol_id) VALUES ('$nombre', '$email, '$password', '$fecha_registro', '$rol_id')";
+    function insertar($nombre, $email, $password, $rol_id){
+        $sql = "INSERT INTO usuario (nombre, email, password, rol_id) VALUES ('$nombre', '$email', '$password', $rol_id)";
         $res = $this->conn->query($sql);
+
     }
 
     function editar($id_usuario, $nombre, $email, $password, $fecha_registro, $rol_id){
         $sql = "UPDATE usuario SET nombre = '$nombre', email = '$email', password = '$password', fecha_registro = '$fecha_registro', rol_id = $rol_id WHERE id_usuario = $id_usuario";
+        $res = $this->conn->query($sql);
+    }
+
+    function eliminar($id_usuario){
+        $sql = "DELETE FROM usuario WHERE id_usuario = $id_usuario";
         $res = $this->conn->query($sql);
     }
 }
