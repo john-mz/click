@@ -1,0 +1,13 @@
+# Ignorar archivos temporales
+uploads/temp_*
+uploads/*.tmp
+
+# Ignorar archivos de sistema
+uploads/.DS_Store
+uploads/Thumbs.db
+
+# Mantener las imágenes subidas
+!uploads/*.jpg
+!uploads/*.jpeg
+!uploads/*.png
+!uploads/*.gif 

@@ -1,65 +1,96 @@
 <?php
+// Habilitar reporte de errores
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 require_once 'controller/publicacion.php';
 $controller = new PublicacionController();
 
+// Inicializar variables de mensaje
+$mensaje = '';
+$tipo_mensaje = '';
 
-// Manejo de acciones
+// Recuperar mensaje de la sesión si existe
+if (isset($_SESSION['mensaje'])) {
+    $mensaje = $_SESSION['mensaje'];
+    $tipo_mensaje = $_SESSION['tipo_mensaje'];
+    // Limpiar mensajes de la sesión
+    unset($_SESSION['mensaje']);
+    unset($_SESSION['tipo_mensaje']);
+}
+
+// Manejar peticiones POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    header('Content-Type: application/json');
+    if (isset($_POST['crear'])) {
+        $descripcion = $_POST['descripcion'] ?? '';
+        $usuario_id = $_POST['usuario_id'] ?? '';
+        
+        // Manejo de la imagen
+        $imagen_url = '';
+        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = 'uploads/';
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            
+            $fileName = uniqid() . '_' . basename($_FILES['imagen']['name']);
+            $targetPath = $uploadDir . $fileName;
+            
+            if (move_uploaded_file($_FILES['imagen']['tmp_name'], $targetPath)) {
+                $imagen_url = $targetPath;
+            } else {
+                $_SESSION['mensaje'] = 'Error al subir la imagen';
+                $_SESSION['tipo_mensaje'] = 'danger';
+                header('Location: index.php?view=publicacion');
+                exit;
+            }
+        }
 
-    
-    if (!isset($_SESSION['id_usuario'])) {
-        echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+        if (!empty($descripcion) && !empty($imagen_url) && !empty($usuario_id)) {
+            $resultado = $controller->crear($descripcion, $imagen_url, $usuario_id);
+            $_SESSION['mensaje'] = $resultado['success'] ? 'Publicación creada correctamente' : ($resultado['message'] ?? 'Error al crear la publicación');
+            $_SESSION['tipo_mensaje'] = $resultado['success'] ? 'success' : 'danger';
+        } else {
+            $_SESSION['mensaje'] = 'Todos los campos son requeridos';
+            $_SESSION['tipo_mensaje'] = 'danger';
+        }
+        header('Location: index.php?view=publicacion');
         exit;
     }
-
-    $action = $_POST['action'] ?? '';
-    
-    switch ($action) {
-        case 'crear':
-            $titulo = $_POST['titulo'] ?? '';
-            $contenido = $_POST['contenido'] ?? '';
-            $id_usuario = $_SESSION['id_usuario'];
-
-            if (empty($titulo) || empty($contenido)) {
-                echo json_encode(['success' => false, 'message' => 'Todos los campos son requeridos']);
-                exit;
-            }
-
-            $controller->crear($titulo, $contenido, $id_usuario);
-            echo json_encode(['success' => true]);
-            exit;
-
-        case 'actualizar':
-            $id_publicacion = $_POST['id_publicacion'] ?? '';
-            $titulo = $_POST['titulo'] ?? '';
-            $contenido = $_POST['contenido'] ?? '';
-            $id_usuario = $_SESSION['id_usuario'];
-
-            if (empty($id_publicacion) || empty($titulo) || empty($contenido)) {
-                echo json_encode(['success' => false, 'message' => 'Todos los campos son requeridos']);
-                exit;
-            }
-
-            $controller->actualizar($id_publicacion, $titulo, $contenido, $id_usuario);
-            echo json_encode(['success' => true]);
-            exit;
-
-        case 'eliminar':
-            $id_publicacion = $_POST['id_publicacion'] ?? '';
-            if (empty($id_publicacion)) {
-                echo json_encode(['success' => false, 'message' => 'ID de publicación no proporcionado']);
-                exit;
-            }
-            $controller->eliminar($id_publicacion);
-            echo json_encode(['success' => true]);
-            exit;
+    else if (isset($_POST['eliminar'])) {
+        $id_publicacion = $_POST['id_publicacion'] ?? '';
+        if (!empty($id_publicacion)) {
+            $resultado = $controller->eliminar($id_publicacion);
+            $_SESSION['mensaje'] = $resultado['success'] ? 'Publicación eliminada correctamente' : ($resultado['message'] ?? 'Error al eliminar la publicación');
+            $_SESSION['tipo_mensaje'] = $resultado['success'] ? 'success' : 'danger';
+        } else {
+            $_SESSION['mensaje'] = 'ID de publicación no proporcionado';
+            $_SESSION['tipo_mensaje'] = 'danger';
+        }
+        header('Location: index.php?view=publicacion');
+        exit;
     }
+}
+
+// Obtener lista de usuarios
+$usuarios = $controller->obtenerUsuarios();
+if (isset($usuarios['error'])) {
+    $usuarios = [];
+    $mensaje = 'Error al cargar la lista de usuarios';
+    $tipo_mensaje = 'warning';
 }
 
 // Obtener publicaciones para mostrar
 $publicaciones = $controller->index();
+if (isset($publicaciones['error'])) {
+    $publicaciones = [];
+    if (empty($mensaje)) {
+        $mensaje = 'Error al cargar las publicaciones';
+        $tipo_mensaje = 'warning';
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -73,30 +104,44 @@ $publicaciones = $controller->index();
 <body>
     <div class="container mt-5">
         <h1>Publicaciones</h1>
+        
+        <?php if (!empty($mensaje)): ?>
+            <div class="alert alert-<?php echo $tipo_mensaje; ?> alert-dismissible fade show" role="alert">
+                <?php echo htmlspecialchars($mensaje); ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
         <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearPublicacionModal">
             Crear Nueva Publicación
         </button>
 
         <div class="row">
-            <?php while($publicacion = $publicaciones->fetch_assoc()): ?>
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo htmlspecialchars($publicacion['descripcion']); ?></h5>
-                        <p class="card-text"><small class="text-muted">
-                            Publicado por: <?php echo htmlspecialchars($publicacion['nombre']); ?><br>
-                            Fecha: <?php echo $publicacion['fecha_creacion']; ?>
-                        </small></p>
-                        <button class="btn btn-warning btn-sm" onclick="editarPublicacion(<?php echo $publicacion['id_publicacion']; ?>)">
-                            Editar
-                        </button>
-                        <button class="btn btn-danger btn-sm" onclick="eliminarPublicacion(<?php echo $publicacion['id_publicacion']; ?>)">
-                            Eliminar
-                        </button>
+            <?php if (empty($publicaciones)): ?>
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        No hay publicaciones disponibles.
                     </div>
                 </div>
-            </div>
-            <?php endwhile; ?>
+            <?php else: ?>
+                <?php foreach($publicaciones as $publicacion): ?>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="<?php echo htmlspecialchars($publicacion['imagen_url']); ?>" class="card-img-top" alt="Imagen de la publicación">
+                        <div class="card-body">
+                            <p class="card-text"><?php echo htmlspecialchars($publicacion['descripcion']); ?></p>
+                            <p class="card-text"><small class="text-muted">
+                                Publicado por: <?php echo htmlspecialchars($publicacion['nombre_usuario']); ?><br>
+                                Fecha: <?php echo $publicacion['fecha_creacion']; ?>
+                            </small></p>
+                            <button class="btn btn-danger btn-sm" onclick="eliminarModal(<?php echo $publicacion['id_publicacion']; ?>)">
+                                Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -109,49 +154,53 @@ $publicaciones = $controller->index();
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="crearPublicacionForm">
+                    <form action="index.php?view=publicacion" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
-                            <label for="titulo" class="form-label">Título</label>
-                            <input type="text" class="form-control" id="titulo" name="titulo" required>
+                            <label for="usuario_id" class="form-label">Usuario</label>
+                            <select class="form-select" id="usuario_id" name="usuario_id" required>
+                                <option value="">Seleccione un usuario</option>
+                                <?php foreach($usuarios as $usuario): ?>
+                                    <option value="<?php echo $usuario['id_usuario']; ?>">
+                                        <?php echo htmlspecialchars($usuario['nombre']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="mb-3">
-                            <label for="contenido" class="form-label">Contenido</label>
-                            <textarea class="form-control" id="contenido" name="contenido" rows="3" required></textarea>
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="imagen" class="form-label">Imagen</label>
+                            <input type="file" class="form-control" id="imagen" name="imagen" accept="image/*" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="submit" class="btn btn-primary" name="crear">Crear</button>
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="crearPublicacion()">Crear</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal para editar publicación -->
-    <div class="modal fade" id="editarPublicacionModal" tabindex="-1">
+    <!-- Modal para eliminar publicación -->
+    <div class="modal fade" id="eliminarPublicacionModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Editar Publicación</h5>
+                    <h5 class="modal-title">Eliminar Publicación</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editarPublicacionForm">
-                        <input type="hidden" id="id_publicacion_editar" name="id_publicacion">
-                        <div class="mb-3">
-                            <label for="titulo_editar" class="form-label">Título</label>
-                            <input type="text" class="form-control" id="titulo_editar" name="titulo" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="contenido_editar" class="form-label">Contenido</label>
-                            <textarea class="form-control" id="contenido_editar" name="contenido" rows="3" required></textarea>
+                    <form action="index.php?view=publicacion" method="post" id="formEliminar">
+                        <input type="hidden" id="id_publicacion_eliminar" name="id_publicacion" value="">
+                        <p>¿Estás seguro de que deseas eliminar esta publicación?</p>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-danger" name="eliminar">Eliminar</button>
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="actualizarPublicacion()">Guardar Cambios</button>
                 </div>
             </div>
         </div>
@@ -159,79 +208,26 @@ $publicaciones = $controller->index();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function crearPublicacion() {
-            const form = document.getElementById('crearPublicacionForm');
-            const formData = new FormData(form);
-            formData.append('action', 'crear');
-
-            fetch('publicacion.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert(data.message || 'Error al crear la publicación');
-                }
-            });
-        }
-
-        function editarPublicacion(id) {
-            fetch(`publicacion.php?id=${id}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('id_publicacion_editar').value = data.publicacion.id_publicacion;
-                    document.getElementById('titulo_editar').value = data.publicacion.titulo;
-                    document.getElementById('contenido_editar').value = data.publicacion.contenido;
-                    new bootstrap.Modal(document.getElementById('editarPublicacionModal')).show();
-                } else {
-                    alert(data.message || 'Error al cargar la publicación');
-                }
-            });
-        }
-
-        function actualizarPublicacion() {
-            const form = document.getElementById('editarPublicacionForm');
-            const formData = new FormData(form);
-            formData.append('action', 'actualizar');
-
-            fetch('publicacion.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    location.reload();
-                } else {
-                    alert(data.message || 'Error al actualizar la publicación');
-                }
-            });
-        }
-
-        function eliminarPublicacion(id) {
-            if (confirm('¿Estás seguro de que deseas eliminar esta publicación?')) {
-                const formData = new FormData();
-                formData.append('action', 'eliminar');
-                formData.append('id_publicacion', id);
-
-                fetch('publicacion.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert(data.message || 'Error al eliminar la publicación');
-                    }
-                });
+        // Función temporal para mostrar información de depuración
+        function eliminarModal(id) {
+            console.log("=== Información de Depuración ===");
+            console.log("ID de la publicación a eliminar:", id);
+            console.log("Tipo de ID:", typeof id);
+            console.log("Valor del campo oculto:", document.getElementById("id_publicacion_eliminar")?.value);
+            console.log("=== Fin de Información ===");
+            
+            // Asignar el ID al campo oculto
+            const inputId = document.getElementById("id_publicacion_eliminar");
+            if (inputId) {
+                inputId.value = id;
+                console.log("ID asignado al campo oculto:", inputId.value);
             }
+            
+            // Mostrar el modal
+            const modal = new bootstrap.Modal(document.getElementById('eliminarPublicacionModal'));
+            modal.show();
         }
     </script>
+    <script src="../view/js/publicacion.js"></script>
 </body>
 </html>
