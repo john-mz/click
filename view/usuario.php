@@ -45,7 +45,7 @@ if ($res->num_rows > 0) {
     $fecha = json_encode($row['fecha_registro']);
 ?>
     <button type='button' onclick='editarModal(<?php echo $id_usuario . ", $nombre, $email, $password, $fecha"; ?>)' class='btn btn-warning' data-bs-toggle='modal' data-bs-target='#exampleModal1'>Editar</button>
-    <button type="submit" name="eliminar" class="btn btn-danger">Eliminar</button>
+    <button type="button" onclick='eliminarModal(<?php echo $id_usuario?>)' class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#eliminarModal">Eliminar</button>
 <?php
     // echo "<a href='index.php?view=usuario&&accion=agregar'>Agregar | </a>";
     // echo "<a href='index.php?view=usuario&&accion=editar&&id_usuario=" . $row['id_usuario'] . "'>Editar | </a>";
@@ -150,5 +150,29 @@ if ($res->num_rows > 0) {
   </div>
 </div>
 </form>
+
+<!-- Modal eliminar -->
+<form action="" method="post">
+<div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Confirmacion</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Esta seguro de que desea eliminar el usuario?
+        <input type="text" class="form-control" name="id_usuario" id="inputIdUsuario1" readonly>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="submit" class="btn btn-primary" name="eliminar">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+</form>
+
+
 
 <script src="view/js/usuario.js"></script>
