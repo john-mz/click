@@ -127,7 +127,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($_POST['eliminar'])) {
+        // $adminId = $_SESSION['usuario_actual']['id'];        
         $id_usuario = $_POST['id_usuario'];
+        // $usuario->setAdminIdSql($adminId);
         $resultado = $controller->eliminar($id_usuario);
         $_SESSION['mensaje'] = $resultado['message'];
         $_SESSION['tipo_mensaje'] = $resultado['success'] ? 'success' : 'danger';

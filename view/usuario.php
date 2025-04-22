@@ -15,6 +15,8 @@ $tipo_mensaje = $_SESSION['tipo_mensaje'] ?? '';
 // Limpiar mensajes de sesión
 unset($_SESSION['mensaje']);
 unset($_SESSION['tipo_mensaje']);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -164,7 +166,7 @@ unset($_SESSION['tipo_mensaje']);
                         </div>
                         <div class="mb-3">
                             <label for="inputFechaRegistro" class="form-label">Fecha Registro</label>
-                            <input type="datetime-local" class="form-control" name="fecha_registro" id="inputFechaRegistro" required>
+                            <input type="datetime-local" class="form-control" name="fecha_registro" id="inputFechaRegistro" step="1" required>
                         </div>
                         <div class="mb-3">
                             <label for="rol" class="form-label">Rol</label>

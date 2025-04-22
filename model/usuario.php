@@ -6,6 +6,11 @@ class Usuario {
         $this->conn = new mysqli('localhost', 'root', '', 'clickupdated');
     }
 
+    function setAdminIdSql($adminId){
+        $sql = "SET @admin_id = $adminId";
+        $res = $this->conn->query($sql);
+    }
+
     function consultar(){
         $sql = "SELECT usuario.id_usuario, usuario.nombre, usuario.email, usuario.password, usuario.fecha_registro, usuario.rol_id, rol.nombre_rol 
                 FROM usuario 
@@ -29,8 +34,8 @@ class Usuario {
 
     function eliminar($id_usuario){
         $sql = "DELETE FROM usuario WHERE id_usuario = $id_usuario";
-        $res = $this->conn->query($sql);
-        return $res;
+        $res = $this->conn->query($sql) or die(mysqli_error($this->conn));
+        // return $res;
     }
 
     function consultarPorId($id_usuario) {
