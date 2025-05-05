@@ -40,7 +40,7 @@ class UsuarioController {
             if (empty($id_usuario) || empty($nombre) || empty($email) || empty($password) || empty($rol_id)) {
                 return ['success' => false, 'message' => 'Todos los campos son requeridos'];
             }
-            $resultado = $this->usuario->editar($id_usuario, $nombre, $email, $password, $fecha_registro, $rol_id);
+            $resultado = $this->usuario->editar($id_usuario, $nombre, $email, $password, $fecha_registro, $rol_id, $_SESSION['usuario_actual']['id']);
             if (!$resultado) {
                 return ['success' => false, 'message' => 'Error al editar el usuario'];
             }
@@ -55,7 +55,7 @@ class UsuarioController {
             if (empty($nombre) || empty($email) || empty($password) || empty($rol_id)) {
                 return ['success' => false, 'message' => 'Todos los campos son requeridos'];
             }
-            $resultado = $this->usuario->insertar($nombre, $email, $password, $rol_id);
+            $resultado = $this->usuario->insertar($nombre, $email, $password, $rol_id, $_SESSION['usuario_actual']['id']);
             if (!$resultado) {
                 return ['success' => false, 'message' => 'Error al crear el usuario'];
             }
@@ -70,7 +70,8 @@ class UsuarioController {
             if (empty($id_usuario)) {
                 return ['success' => false, 'message' => 'ID de usuario no proporcionado'];
             }
-            $resultado = $this->usuario->eliminar($id_usuario);
+            $admin_id = $_SESSION['usuario_actual']['id']; 
+            $resultado = $this->usuario->eliminar($id_usuario, $admin_id);
             if (!$resultado) {
                 return ['success' => false, 'message' => 'Error al eliminar el usuario'];
             }
@@ -107,7 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_POST['password'];
         $fecha_registro = $_POST['fecha_registro'];
         $rol_id = $_POST['rol'];
-        $resultado = $controller->editar($id_usuario, $nombre, $email, $password, $fecha_registro, $rol_id);
+        $admin_id = $_SESSION['usuario_actual']['id'];
+        $controller->editar($id_usuario, $nombre, $email, $password, $fecha_registro, $rol_id, $admin_id);
         $_SESSION['mensaje'] = $resultado['message'];
         $_SESSION['tipo_mensaje'] = $resultado['success'] ? 'success' : 'danger';
         header('Location: index.php?view=usuario');
@@ -127,8 +129,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (isset($_POST['eliminar'])) {
+        $admin_id = $_SESSION['usuario_actual']['id'];        
         $id_usuario = $_POST['id_usuario'];
-        $resultado = $controller->eliminar($id_usuario);
+        // $usuario->setAdminIdSql($adminId);
+        $resultado = $controller->eliminar($id_usuario, $admin_id);
         $_SESSION['mensaje'] = $resultado['message'];
         $_SESSION['tipo_mensaje'] = $resultado['success'] ? 'success' : 'danger';
         header('Location: index.php?view=usuario');
