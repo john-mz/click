@@ -32,6 +32,8 @@ class Publicacion {
         )");
     }
 
+    
+
     public function setUsuarioActual($usuario) {
         $this->usuarioActual = $usuario;
     }

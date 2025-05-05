@@ -12,6 +12,12 @@ class PublicacionController {
         $this->usuario = new Usuario();
         $this->usuarioActual = null;
     }
+    public function consultarTendencias(){
+        $sql = "SELECT * FROM tendencias";
+        $conn = new mysqli('localhost', 'root', '', 'clickupdated');
+        $res = $conn->query($sql);
+        return $res;
+    }
 
     public function setUsuarioActual($usuario) {
         $this->usuarioActual = $usuario;

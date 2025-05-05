@@ -17,6 +17,8 @@ $controller = new PublicacionController();
 $mensaje = '';
 $tipo_mensaje = '';
 
+
+
 // Recuperar mensaje de la sesión si existe
 if (isset($_SESSION['mensaje'])) {
     $mensaje = $_SESSION['mensaje'];
@@ -89,6 +91,9 @@ if (isset($usuarios['error'])) {
 
 // Obtener publicaciones para mostrar
 $publicaciones = $controller->index();
+
+
+
 if (isset($publicaciones['error'])) {
     $publicaciones = [];
     if (empty($mensaje)) {
@@ -96,6 +101,8 @@ if (isset($publicaciones['error'])) {
         $tipo_mensaje = 'warning';
     }
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -108,6 +115,7 @@ if (isset($publicaciones['error'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
+
     <!-- Barra de navegación -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
@@ -145,6 +153,8 @@ if (isset($publicaciones['error'])) {
         </div>
     </nav>
 
+    
+
     <div class="container mt-5">
         <!-- Botones de filtrado -->
         <div class="mb-3">
@@ -167,6 +177,9 @@ if (isset($publicaciones['error'])) {
 
         <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#crearPublicacionModal" id="btnCrearPublicacion">
             Crear Nueva Publicación
+        </button>
+        <button class="btn btn-warning mb-3">
+            Ver Tendencias 🔥
         </button>
 
         <div class="row" id="contenedorPublicaciones">
@@ -401,5 +414,13 @@ if (isset($publicaciones['error'])) {
             color: white;
         }
     </style>
+<?php 
+if ($controller->consultarTendencias()) {
+    $row = $controller->consultarTendencias()->fetch_row();
+    $jsonString = $row[0];
+
+    $publicaciones = json_decode($jsonString);
+    print_r($publicaciones);
+}?>
 </body>
 </html>
