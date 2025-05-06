@@ -204,11 +204,17 @@ if (isset($publicaciones['error'])) {
                                         <span class="contador-dislikes"><?php echo $publicacion['noMeGusta'] ?? 0; ?></span>
                                     </button>
                                 </div>
-                                <?php if ($_SESSION['usuario_actual']['rol'] === 'admin' || $_SESSION['usuario_actual']['id'] == $publicacion['usuario_id']): ?>
+                                <?php if (
+                                    $_SESSION['usuario_actual']['rol'] === 'admin' || 
+                                    $_SESSION['usuario_actual']['id'] == $publicacion['usuario_id']
+                                ): ?>
                                     <button class="btn btn-danger btn-sm btn-eliminar" onclick="eliminarModal(<?php echo $publicacion['id_publicacion']; ?>)">
                                         <i class="bi bi-trash"></i> Eliminar
                                     </button>
                                 <?php endif; ?>
+                                <a href="index.php?view=comentario&id_publicacion=<?php echo $publicacion['id_publicacion']; ?>" class="btn btn-secondary btn-sm ms-2">
+                                    <i class="bi bi-chat-dots"></i> Comentarios
+                                </a>
                             </div>
                         </div>
                     </div>
