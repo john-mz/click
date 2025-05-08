@@ -157,50 +157,258 @@ if (!isset($_GET['view']) || $_GET['view'] === 'index') {
         <title>Inicio - Sistema de Publicaciones</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+        <style>
+            :root {
+                --reddit-orange: #ff4500;
+                --reddit-dark: #1a1a1b;
+                --reddit-light: #ffffff;
+                --reddit-gray: #878a8c;
+                --reddit-gray-dark: #232324;
+                --header-height: 56px;
+            }
+            body {
+                background: #181819;
+                color: #fff;
+                min-height: 100vh;
+                margin: 0;
+                font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+                padding-top: 2rem;
+            }
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 2rem;
+            }
+            .card {
+                background: #232324;
+                border: none;
+                border-radius: 12px;
+                margin-bottom: 1.5rem;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+            }
+            .card-header {
+                background: #232324;
+                border-bottom: 1px solid #333;
+                padding: 1.5rem;
+            }
+            .card-body {
+                padding: 1.5rem;
+            }
+            .btn-click {
+                background: var(--reddit-orange);
+                color: #fff !important;
+                border: none;
+                border-radius: 20px;
+                padding: 8px 24px;
+                font-weight: 500;
+                font-size: 1.1rem;
+                transition: background 0.2s;
+            }
+            .btn-click:hover {
+                background: #d93a00;
+                color: #fff !important;
+            }
+            .reddit-logo {
+                width: 38px; height: 38px;
+                margin: 0 18px 0 12px;
+                display: flex; align-items: center; justify-content: center;
+            }
+            .reddit-logo svg {
+                width: 38px; height: 38px;
+            }
+            .reddit-title {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--reddit-orange);
+                margin-right: 24px;
+            }
+            .reddit-search {
+                flex: 1;
+                max-width: 400px;
+                margin: 0 24px;
+            }
+            .reddit-search input {
+                width: 100%;
+                border-radius: 20px;
+                border: none;
+                padding: 7px 16px;
+                background: #272729;
+                color: #fff;
+            }
+            .reddit-user {
+                display: flex; align-items: center;
+                gap: 10px;
+                margin-right: 24px;
+            }
+            .reddit-user .bi-person-circle {
+                font-size: 1.5rem;
+            }
+            .main-content {
+                padding-top: calc(var(--header-height) + 2rem);
+                padding-right: 2rem;
+                padding-left: 2rem;
+                min-height: 100vh;
+            }
+            .list-group-item {
+                background: #181819;
+                border: 1px solid #232324;
+                border-radius: 10px !important;
+                margin-bottom: 10px;
+                color: #fff;
+            }
+            .list-group-item:hover {
+                background: #232324;
+                color: #fff;
+            }
+            .btn-click-dark {
+                background: #333;
+                color: #fff !important;
+                border: none;
+                border-radius: 20px;
+                padding: 6px 18px;
+                font-weight: 500;
+                font-size: 1rem;
+                transition: background 0.2s;
+                margin-right: 0.3rem;
+            }
+            .btn-click-dark:hover {
+                background: #222;
+                color: #fff !important;
+            }
+            .badge {
+                padding: 6px 12px;
+                border-radius: 6px;
+                font-weight: 500;
+                letter-spacing: 0.3px;
+                font-size: 0.95rem;
+            }
+            .badge.bg-primary {
+                background: var(--reddit-orange) !important;
+                color: #fff !important;
+            }
+            .badge.bg-secondary {
+                background: var(--reddit-gray) !important;
+                color: #fff !important;
+            }
+            .welcome-section {
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+            .welcome-section h1 {
+                color: var(--reddit-orange);
+                font-weight: 700;
+                letter-spacing: -0.5px;
+            }
+            .welcome-section .lead {
+                color: #bbb;
+            }
+            .user-avatar {
+                width:40px;
+                height:40px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                background: var(--reddit-gray-dark);
+                border-radius:50%;
+                color:var(--reddit-orange);
+                font-size: 1.5rem;
+            }
+            @media (max-width: 900px) {
+                .main-content {
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                }
+            }
+            .input-group.mb-4 {
+                background: #fff;
+                border-radius: 20px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+                padding: 2px 6px;
+            }
+            .input-group.mb-4 .input-group-text {
+                background: #fff;
+                border: none;
+                color: #333;
+            }
+            .input-group.mb-4 .bi-search {
+                color: #333 !important;
+            }
+            .input-group.mb-4 .form-control {
+                background: #fff !important;
+                color: #232324 !important;
+                border: none;
+                border-radius: 20px;
+                font-weight: 500;
+            }
+            .input-group.mb-4 .form-control::placeholder {
+                color: #888 !important;
+                opacity: 1;
+            }
+            .form-label {
+                color: #fff;
+                font-weight: 500;
+            }
+            .form-select {
+                background: #232324 !important;
+                color: #fff !important;
+                border: 1.5px solid #333;
+                border-radius: 12px;
+                font-size: 1.1rem;
+                font-weight: 500;
+                box-shadow: none;
+                transition: border-color 0.2s;
+            }
+            .form-select:focus {
+                border-color: var(--reddit-orange);
+                box-shadow: 0 0 0 0.15rem rgba(255,69,0,0.15);
+                background: #232324 !important;
+                color: #fff !important;
+            }
+            .form-select option {
+                background: #232324;
+                color: #fff;
+            }
+            .form-select option[disabled], .form-select option[value=""] {
+                color: #bbb;
+            }
+        </style>
     </head>
     <body>
-        <div class="container mt-5">
+        <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-8 text-center">
-                    <h1 class="mb-4">Bienvenido a Click Administration</h1>
-                    
-                    <?php if (!empty($mensaje)): ?>
-                        <div class="alert alert-<?php echo $tipo_mensaje; ?> alert-dismissible fade show" role="alert">
-                            <?php echo htmlspecialchars($mensaje); ?>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <h1 class="mb-4" style="color: var(--reddit-orange);">Bienvenido a Click</h1>
+                            <p class="lead mb-0">Selecciona un usuario para comenzar</p>
                         </div>
-                    <?php endif; ?>
-
-                    <div class="card mb-4">
                         <div class="card-body">
-                            <h5 class="card-title">Selecciona tu usuario</h5>
-                            <form action="index.php" method="post" class="mb-3">
-                                <div class="input-group mb-3">
-                                    <input type="text" class="form-control" id="buscarUsuario" placeholder="Buscar usuario...">
-                                    <button class="btn btn-outline-secondary" type="button" id="btnBuscar">
-                                        <i class="bi bi-search"></i>
-                                    </button>
-                                </div>
+                            <form method="post" class="mb-4">
                                 <div class="list-group" id="listaUsuarios">
                                     <?php foreach($usuarios as $usuario): ?>
-                                        <div class="list-group-item">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <i class="bi bi-person-circle"></i>
-                                                    <?php echo htmlspecialchars($usuario['nombre']); ?>
-                                                    <span class="badge bg-<?php echo $usuario['rol'] === 'admin' ? 'primary' : 'secondary'; ?> ms-2">
+                                        <div class="list-group-item usuario-item d-flex justify-content-between align-items-center" style="background:#232324; color:#fff; border:1px solid #333; border-radius:10px; margin-bottom:10px;">
+                                            <div class="d-flex align-items-center">
+                                                <div class="user-avatar me-3" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:#333;border-radius:50%;color:var(--reddit-orange);">
+                                                    <i class="bi bi-person-circle fs-4"></i>
+                                                </div>
+                                                <div class="user-info">
+                                                    <h6 class="mb-0" style="color:#fff;font-weight:600;">
+                                                        <?php echo htmlspecialchars($usuario['nombre']); ?>
+                                                    </h6>
+                                                    <span class="badge <?php echo $usuario['rol'] === 'admin' ? 'bg-primary' : 'bg-secondary'; ?>" style="margin-left:2px;">
                                                         <?php echo htmlspecialchars($usuario['rol']); ?>
                                                     </span>
                                                 </div>
-                                                <form method="post" class="d-inline">
-                                                    <input type="hidden" name="usuario_id" value="<?php echo $usuario['id_usuario']; ?>">
-                                                    <input type="hidden" name="usuario_nombre" value="<?php echo htmlspecialchars($usuario['nombre']); ?>">
-                                                    <input type="hidden" name="usuario_rol" value="<?php echo htmlspecialchars($usuario['rol']); ?>">
-                                                    <button type="submit" name="seleccionar_usuario" class="btn btn-primary">
-                                                        Seleccionar
-                                                    </button>
-                                                </form>
                                             </div>
+                                            <form method="post" class="d-inline">
+                                                <input type="hidden" name="usuario_id" value="<?php echo $usuario['id_usuario']; ?>">
+                                                <input type="hidden" name="usuario_nombre" value="<?php echo htmlspecialchars($usuario['nombre']); ?>">
+                                                <input type="hidden" name="usuario_rol" value="<?php echo htmlspecialchars($usuario['rol']); ?>">
+                                                <button type="submit" name="seleccionar_usuario" class="btn btn-click">
+                                                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                                                    Seleccionar
+                                                </button>
+                                            </form>
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
@@ -210,31 +418,7 @@ if (!isset($_GET['view']) || $_GET['view'] === 'index') {
                 </div>
             </div>
         </div>
-
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const buscarInput = document.getElementById('buscarUsuario');
-                const listaUsuarios = document.getElementById('listaUsuarios');
-                const items = listaUsuarios.getElementsByClassName('usuario-item');
-
-                buscarInput.addEventListener('input', function() {
-                    const busqueda = this.value.toLowerCase();
-                    
-                    Array.from(items).forEach(item => {
-                        const nombre = item.dataset.nombre.toLowerCase();
-                        const id = item.dataset.id;
-                        const texto = `${nombre} ${id}`;
-                        
-                        if (texto.includes(busqueda)) {
-                            item.style.display = 'block';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
-                });
-            });
-        </script>
     </body>
     </html>
     <?php
@@ -269,31 +453,29 @@ if (!isset($_GET['view']) || $_GET['view'] === 'index') {
                 $respuestas = $controllerComentario->obtenerRespuestas($_GET['parent_id']);
                 foreach ($respuestas as $respuesta) {
                     echo '<div class="respuesta-box" id="comentario-' . $respuesta['id_comentario'] . '">';
-                    echo '<div class="d-flex align-items-start">';
-                    echo '<div class="avatar"><i class="bi bi-person-circle"></i></div>';
-                    echo '<div>';
-                    echo '<strong>' . htmlspecialchars($respuesta['nombre_usuario']) . '</strong><br>';
-                    echo '<span>' . mostrarAt($respuesta['comentario'], $usuario_actual['nombre']) . '</span><br>';
-                    echo '<small class="text-muted">' . $respuesta['fecha_comentario'] . '</small>';
-                    echo '<div>';
-                    echo '<button class="btn btn-link btn-responder p-0" onclick="mostrarFormularioRespuesta(' . $respuesta['id_comentario'] . ', \'' . htmlspecialchars($respuesta['nombre_usuario']) . '\', true)">Responder</button>';
-                    echo '<button class="btn-ver-respuestas" onclick="toggleRespuestas(' . $respuesta['id_comentario'] . ')">Ver respuestas</button>';
+                    echo '<div class="comentario-header">';
+                    echo '<i class="bi bi-person-circle me-2"></i>';
+                    echo '<span class="autor">' . htmlspecialchars($respuesta['nombre_usuario']) . '</span>';
+                    echo '<span class="tiempo">' . $respuesta['fecha_comentario'] . '</span>';
+                    echo '</div>';
+                    echo '<div class="comentario-contenido">' . mostrarAt($respuesta['comentario'], $usuario_actual['nombre']) . '</div>';
+                    echo '<div class="comentario-acciones">';
+                    echo '<button type="button" class="btn btn-click accion-btn" onclick="mostrarFormularioRespuesta(' . $respuesta['id_comentario'] . ', \'' . addslashes(htmlspecialchars($respuesta['nombre_usuario'], ENT_QUOTES, 'UTF-8')) . '\', true)"><i class="bi bi-reply"></i> <span>Responder</span></button>';
                     if (puedeEliminarComentario($respuesta, $usuario_actual, $publicacion)) {
-                        echo '<button class="btn btn-danger btn-sm ms-2" onclick="eliminarComentario(' . $respuesta['id_comentario'] . ')"><i class="bi bi-trash"></i> Eliminar</button>';
+                        echo '<button type="button" class="btn btn-click accion-btn" onclick="eliminarComentario(' . $respuesta['id_comentario'] . ')"><i class="bi bi-trash"></i> <span>Eliminar</span></button>';
                     }
                     echo '</div>';
-                    echo '<div class="respuestas mt-2" id="respuestas-' . $respuesta['id_comentario'] . '" style="display:none;"></div>';
+                    // Formulario oculto para responder a la respuesta
                     echo '<form method="post" action="index.php?view=comentario&id_publicacion=' . $id_publicacion . '" class="mt-2 respuesta-form" id="respuesta-form-' . $respuesta['id_comentario'] . '" style="display:none;">';
-                    echo '<div class="d-flex align-items-start">';
-                    echo '<div class="avatar"><i class="bi bi-person-circle"></i></div>';
-                    echo '<textarea class="form-control me-2" name="comentario" rows="2" placeholder="Responder a ' . htmlspecialchars($respuesta['nombre_usuario']) . '..." required></textarea>';
-                    echo '<button type="submit" class="btn btn-primary">Responder</button>';
+                    echo '<div class="form-group">';
+                    echo '<textarea class="form-control" name="comentario" rows="2" placeholder="Responder a ' . htmlspecialchars($respuesta['nombre_usuario']) . '..." required></textarea>';
+                    echo '</div>';
+                    echo '<div class="d-flex justify-content-end mt-2">';
+                    echo '<button type="submit" class="btn btn-click">Responder</button>';
                     echo '</div>';
                     echo '<input type="hidden" name="parent_id" value="' . $respuesta['id_comentario'] . '">';
                     echo '<input type="hidden" name="id_publicacion" value="' . $id_publicacion . '">';
                     echo '</form>';
-                    echo '</div>';
-                    echo '</div>';
                     echo '</div>';
                 }
                 exit;

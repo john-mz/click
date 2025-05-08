@@ -1,10 +1,1 @@
-setiar auth system:
-    - cada vez que se llame una vista diferente que se verifique si la persona tiene usuario logged
-    recursos: https://dev.to/ettalibi02assia/building-a-secured-user-authentication-system-with-php-mysql-pdo-and-hashed-password-4mpj
-
-usuarios crud
-    -hacer que editar sirva
-
-publicaciones crud
-    -ver este video y hacer el front end
-    https://www.youtube.com/watch?v=24Sd2ayyC-w     
+Hacerlo mas cool uwuowoewe :v la grasa papu

@@ -43,3 +43,23 @@ function eliminarModal(id_publicacion) {
         }
     };
 }
+
+// Modo claro/oscuro global para todo el proyecto
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+}
+
+function toggleTheme() {
+    const current = localStorage.getItem('theme') || 'light';
+    setTheme(current === 'light' ? 'dark' : 'light');
+}
+
+// Inicializar tema al cargar
+(function() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+})();
+
+// Exportar para uso global
+window.toggleTheme = toggleTheme;
