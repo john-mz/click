@@ -1,3 +1,5 @@
+
+
 // Funciones para manejar los modales
 function editarModal(id_publicacion, descripcion, imagen_url, usuario_id) {
     document.getElementById("id_publicacion_editar").value = id_publicacion;

@@ -91,6 +91,31 @@ if (isset($usuarios['error'])) {
 
 // Obtener publicaciones para mostrar
 $publicaciones = $controller->index();
+// print_r($publicaciones);
+
+$tendencias = $controller->consultarTendencias();
+// print_r($tendencias);
+$publicacionesx = [];
+if ($tendencias->num_rows > 0) {
+    // Fetch each row as an associative array
+    while ($row = $tendencias->fetch_assoc()) {
+        $publicaciona = [
+            'id_publicacion' => $row['id_publicacion'],
+            'descripcion' => $row['descripcion'],
+            'imagen_url' => $row['imagen_url'],
+            'fecha_creacion' => $row['fecha_creacion'],
+            'usuario_id' => $row['usuario_id'],
+            'nombre_usuario' => $row['nombre_usuario'],
+            'meGusta' => $row['meGusta'],
+            'noMeGusta' => $row['noMeGusta']
+        ];
+
+        $publicacionesx[] = $publicaciona;
+    }
+
+    $json_data = json_encode($publicacionesx, JSON_PRETTY_PRINT);
+    file_put_contents('json/nosql.json', $json_data);
+}
 
 
 
@@ -181,55 +206,122 @@ if (isset($publicaciones['error'])) {
         <button class="btn btn-warning mb-3">
             Ver Tendencias 🔥
         </button>
+        
+        <!-- tendencias -->
+<div class="row" id="contenedorTendencias">
+    <?php if (empty($publicacionesx)) : ?>
+        <div class="col-12">
+            <div class="alert alert-info">
+                No hay publicaciones disponibles.
+            </div>
+        </div>
+    <?php else : ?>
+        <h1>TENDENCIAS</h1>
+        <?php foreach ($publicacionesx as $publicacion) : ?>
+            <div class="col-md-4 mb-4 publicacion" data-usuario-id="<?php echo $publicacion['usuario_id']; ?>">
+                <div class="card">
+                    <?php if (!empty($publicacion['imagen_url'])) : ?>
+                        <img src="<?php echo htmlspecialchars($publicacion['imagen_url']); ?>" class="card-img-top" alt="Imagen de la publicación">
+                    <?php endif; ?>
 
-        <div class="row" id="contenedorPublicaciones">
-            <?php if (empty($publicaciones)): ?>
-                <div class="col-12">
-                    <div class="alert alert-info">
-                        No hay publicaciones disponibles.
-                    </div>
-                </div>
-            <?php else: ?>
-                <?php foreach($publicaciones as $publicacion): ?>
-                <div class="col-md-4 mb-4 publicacion" data-usuario-id="<?php echo $publicacion['usuario_id']; ?>">
-                    <div class="card">
-                        <?php if (!empty($publicacion['imagen_url'])): ?>
-                            <img src="<?php echo htmlspecialchars($publicacion['imagen_url']); ?>" class="card-img-top" alt="Imagen de la publicación">
-                        <?php endif; ?>
-                        <div class="card-body">
-                            <p class="card-text"><?php echo htmlspecialchars($publicacion['descripcion']); ?></p>
-                            <p class="card-text"><small class="text-muted">
+                    <div class="card-body">
+                        <p class="card-text"><?php echo htmlspecialchars($publicacion['descripcion']); ?></p>
+                        <p class="card-text">
+                            <small class="text-muted">
                                 Publicado por: <?php echo htmlspecialchars($publicacion['nombre_usuario']); ?><br>
                                 Fecha: <?php echo $publicacion['fecha_creacion']; ?>
-                            </small></p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <button class="btn btn-outline-primary btn-sm btn-like" 
-                                            data-publicacion-id="<?php echo $publicacion['id_publicacion']; ?>"
-                                            onclick="reaccionar(<?php echo $publicacion['id_publicacion']; ?>, 'like')">
-                                        <i class="bi bi-hand-thumbs-up"></i>
-                                        <span class="contador-likes"><?php echo $publicacion['meGusta'] ?? 0; ?></span>
-                                    </button>
-                                    <button class="btn btn-outline-danger btn-sm btn-dislike" 
-                                            data-publicacion-id="<?php echo $publicacion['id_publicacion']; ?>"
-                                            onclick="reaccionar(<?php echo $publicacion['id_publicacion']; ?>, 'dislike')">
-                                        <i class="bi bi-hand-thumbs-down"></i>
-                                        <span class="contador-dislikes"><?php echo $publicacion['noMeGusta'] ?? 0; ?></span>
-                                    </button>
-                                </div>
-                                <?php if ($_SESSION['usuario_actual']['rol'] === 'admin' || $_SESSION['usuario_actual']['id'] == $publicacion['usuario_id']): ?>
-                                    <button class="btn btn-danger btn-sm btn-eliminar" onclick="eliminarModal(<?php echo $publicacion['id_publicacion']; ?>)">
-                                        <i class="bi bi-trash"></i> Eliminar
-                                    </button>
-                                <?php endif; ?>
+                            </small>
+                        </p>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <button class="btn btn-outline-primary btn-sm btn-like"
+                                        data-publicacion-id="<?php echo $publicacion['id_publicacion']; ?>"
+                                        onclick="reaccionar(<?php echo $publicacion['id_publicacion']; ?>, 'like')">
+                                    <i class="bi bi-hand-thumbs-up"></i>
+                                    <span class="contador-likes"><?php echo $publicacion['meGusta'] ?? 0; ?></span>
+                                </button>
+
+                                <button class="btn btn-outline-danger btn-sm btn-dislike"
+                                        data-publicacion-id="<?php echo $publicacion['id_publicacion']; ?>"
+                                        onclick="reaccionar(<?php echo $publicacion['id_publicacion']; ?>, 'dislike')">
+                                    <i class="bi bi-hand-thumbs-down"></i>
+                                    <span class="contador-dislikes"><?php echo $publicacion['noMeGusta'] ?? 0; ?></span>
+                                </button>
                             </div>
+
+                            <?php if ($_SESSION['usuario_actual']['rol'] === 'admin' || $_SESSION['usuario_actual']['id'] == $publicacion['usuario_id']) : ?>
+                                <button class="btn btn-danger btn-sm btn-eliminar"
+                                        onclick="eliminarModal(<?php echo $publicacion['id_publicacion']; ?>)">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
+
+<hr>
+
+        <!-- /tendencias -->
+<div class="row" id="contenedorPublicaciones">
+    <?php if (empty($publicaciones)) : ?>
+        <div class="col-12">
+            <div class="alert alert-info">
+                No hay publicaciones disponibles.
+            </div>
         </div>
-    </div>
+    <?php else : ?>
+        <?php foreach ($publicaciones as $publicacion) : ?>
+            <div class="col-md-4 mb-4 publicacion" data-usuario-id="<?php echo $publicacion['usuario_id']; ?>">
+                <div class="card">
+                    <?php if (!empty($publicacion['imagen_url'])) : ?>
+                        <img src="<?php echo htmlspecialchars($publicacion['imagen_url']); ?>" class="card-img-top" alt="Imagen de la publicación">
+                    <?php endif; ?>
+
+                    <div class="card-body">
+                        <p class="card-text"><?php echo htmlspecialchars($publicacion['descripcion']); ?></p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                Publicado por: <?php echo htmlspecialchars($publicacion['nombre_usuario']); ?><br>
+                                Fecha: <?php echo $publicacion['fecha_creacion']; ?>
+                            </small>
+                        </p>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group">
+                                <button class="btn btn-outline-primary btn-sm btn-like"
+                                        data-publicacion-id="<?php echo $publicacion['id_publicacion']; ?>"
+                                        onclick="reaccionar(<?php echo $publicacion['id_publicacion']; ?>, 'like')">
+                                    <i class="bi bi-hand-thumbs-up"></i>
+                                    <span class="contador-likes"><?php echo $publicacion['meGusta'] ?? 0; ?></span>
+                                </button>
+
+                                <button class="btn btn-outline-danger btn-sm btn-dislike"
+                                        data-publicacion-id="<?php echo $publicacion['id_publicacion']; ?>"
+                                        onclick="reaccionar(<?php echo $publicacion['id_publicacion']; ?>, 'dislike')">
+                                    <i class="bi bi-hand-thumbs-down"></i>
+                                    <span class="contador-dislikes"><?php echo $publicacion['noMeGusta'] ?? 0; ?></span>
+                                </button>
+                            </div>
+
+                            <?php if ($_SESSION['usuario_actual']['rol'] === 'admin' || $_SESSION['usuario_actual']['id'] == $publicacion['usuario_id']) : ?>
+                                <button class="btn btn-danger btn-sm btn-eliminar"
+                                        onclick="eliminarModal(<?php echo $publicacion['id_publicacion']; ?>)">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
+
 
     <!-- Modal para crear publicación -->
     <div class="modal fade" id="crearPublicacionModal" tabindex="-1">
@@ -298,7 +390,9 @@ if (isset($publicaciones['error'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+
         document.addEventListener('DOMContentLoaded', function() {
+            const tendencias = document.getElementById('contenedorTendencias');
             const verMisPublicaciones = document.getElementById('verMisPublicaciones');
             const verTodasPublicaciones = document.getElementById('verTodasPublicaciones');
             const publicaciones = document.querySelectorAll('.publicacion');
@@ -309,6 +403,10 @@ if (isset($publicaciones['error'])) {
                 publicaciones.forEach(publicacion => {
                     publicacion.style.display = 'block';
                 });
+            }
+
+            function mostrarTendencias(){
+                tendencias.style.display = "block";
             }
 
             // Función para mostrar solo las publicaciones del usuario actual
@@ -414,13 +512,6 @@ if (isset($publicaciones['error'])) {
             color: white;
         }
     </style>
-<?php 
-if ($controller->consultarTendencias()) {
-    $row = $controller->consultarTendencias()->fetch_row();
-    $jsonString = $row[0];
 
-    $publicaciones = json_decode($jsonString);
-    print_r($publicaciones);
-}?>
 </body>
 </html>
