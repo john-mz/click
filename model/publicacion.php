@@ -90,13 +90,6 @@ class Publicacion {
         return $stmt->execute();
     }
 
-    public function eliminar($id) {
-        $sql = "DELETE FROM publicacion WHERE id_publicacion = ?";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $id);
-        return $stmt->execute();
-    }
-
     public function obtenerReacciones($publicacion_id) {
         $sql = "SELECT meGusta, noMeGusta FROM conteoreal WHERE id_publicacion = ?";
         $stmt = $this->conn->prepare($sql);
@@ -203,5 +196,12 @@ class Publicacion {
             $this->conn->rollback();
             return false;
         }
+    }
+
+    public function eliminar($id) {
+        $sql = "DELETE FROM publicacion WHERE id_publicacion = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        return $stmt->execute();
     }
 }

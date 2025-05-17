@@ -117,30 +117,6 @@ class PublicacionController {
         }
     }
 
-    public function eliminar($id) {
-        try {
-            if (empty($id)) {
-                return ['success' => false, 'message' => 'ID de publicación no proporcionado'];
-            }
-
-            // Verificar permisos si es usuario invitado
-            if ($this->usuarioActual && $this->usuarioActual['rol'] !== 'admin') {
-                $publicacion = $this->publicacion->consultarPorId($id);
-                if (!$publicacion || $publicacion['usuario_id'] != $this->usuarioActual['id']) {
-                    return ['success' => false, 'message' => 'No tienes permiso para eliminar esta publicación'];
-                }
-            }
-
-            $resultado = $this->publicacion->eliminar($id);
-            if (!$resultado) {
-                return ['success' => false, 'message' => 'Error al eliminar la publicación'];
-            }
-            return ['success' => true];
-        } catch (Exception $e) {
-            return ['success' => false, 'message' => $e->getMessage()];
-        }
-    }
-
     public function obtenerUsuarios() {
         try {
             $result = $this->usuario->consultar();
@@ -165,6 +141,25 @@ class PublicacionController {
 
             $resultado = $this->publicacion->agregarReaccion($publicacion_id, $usuario_id, $tipo);
             return $resultado;
+        } catch (Exception $e) {
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    public function eliminar($id) {
+        try {
+            if (empty($id)) {
+                return ['success' => false, 'message' => 'ID de publicación no proporcionado'];
+            }
+            // Verificar permisos si es usuario admin
+            if ($this->usuarioActual && $this->usuarioActual['rol'] !== 'admin') {
+                return ['success' => false, 'message' => 'No tienes permiso para eliminar esta publicación'];
+            }
+            $resultado = $this->publicacion->eliminar($id);
+            if (!$resultado) {
+                return ['success' => false, 'message' => 'Error al eliminar la publicación'];
+            }
+            return ['success' => true];
         } catch (Exception $e) {
             return ['success' => false, 'message' => $e->getMessage()];
         }

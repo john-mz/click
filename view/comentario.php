@@ -249,7 +249,7 @@
         .comentario-box {
             background: #232324;
             border-radius: 14px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            box-shadow: none;
             margin-bottom: 18px;
             padding: 1.1rem 1.3rem 0.7rem 1.3rem;
             display: flex;
@@ -319,42 +319,13 @@
             color: #bbb !important;
             opacity: 1;
         }
-        .respuesta-box {
-            background: #232324;
-            border-radius: 14px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-            margin-bottom: 14px;
-            margin-left: 32px;
-            padding: 1rem 1.2rem 0.7rem 1.2rem;
-            display: flex;
-            flex-direction: column;
-        }
-        .respuesta-box .comentario-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 0.2rem;
-        }
-        .respuesta-box .comentario-header .autor {
-            color: var(--reddit-orange);
-            font-weight: 600;
-        }
-        .respuesta-box .comentario-header .tiempo {
-            color: #bbb;
-            font-size: 0.98rem;
-            margin-left: 8px;
-        }
-        .respuesta-box .comentario-contenido {
-            margin-bottom: 0.7rem;
-            font-size: 1.08rem;
-            color: #fff;
-            word-break: break-word;
-        }
-        .respuesta-box .comentario-acciones {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 0.5rem;
+        .btn-responder { font-size: 0.9em; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; background: #eee; display: inline-block; text-align: center; line-height: 40px; font-size: 1.5em; color: #888; margin-right: 10px; }
+        .btn-ver-respuestas { color: #0d6efd; background: none; border: none; padding: 0; }
+        .at-mention { color: #00bfff; font-weight: bold; }
+        .respuestas {
+            margin-left: 0 !important;
+            padding-left: 0 !important;
         }
     </style>
 </head>
@@ -431,10 +402,9 @@
         <?php if ($publicacion['success'] ?? false): ?>
         <!-- Formulario para nuevo comentario -->
         <form method="post" action="index.php?view=comentario&id_publicacion=<?php echo $publicacion['publicacion']['id_publicacion']; ?>" class="mb-4">
-            <div class="form-group">
-                <textarea class="form-control" name="comentario" rows="2" placeholder="¿Qué piensas?" required></textarea>
-            </div>
-            <div class="d-flex justify-content-end mt-2">
+            <div class="d-flex align-items-start">
+                <div class="avatar"><i class="bi bi-person-circle"></i></div>
+                <textarea class="form-control me-2" name="comentario" rows="2" placeholder="Añade un comentario..." required></textarea>
                 <button type="submit" class="btn btn-primary">Comentar</button>
             </div>
             <input type="hidden" name="parent_id" value="">
@@ -480,33 +450,51 @@
     </main>
     <script>
     function mostrarFormularioRespuesta(id, usuario, esRespuesta) {
-        // Lógica para mostrar el formulario de respuesta
-        const form = document.getElementById('respuesta-form-' + id);
-        if (form) {
-            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        document.querySelectorAll('.respuesta-form').forEach(f => f.style.display = 'none');
+        var form = document.getElementById('respuesta-form-' + id);
+        form.style.display = 'block';
+        var textarea = form.querySelector('textarea');
+        var atInput = form.querySelector('input[name=at_usuario]');
+        if (atInput) atInput.remove(); // Limpia campo anterior si existe
+        if (esRespuesta) {
+            textarea.value = '@' + usuario + ' ';
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'at_usuario';
+            input.value = usuario;
+            form.appendChild(input);
+            // Cambiar el parent_id al del comentario principal
+            var parentInput = form.querySelector('input[name=parent_id]');
+            if (parentInput) {
+                var mainParent = form.closest('.comentario-box');
+                if (mainParent) {
+                    parentInput.value = mainParent.id.replace('comentario-', '');
+                }
+            }
+        } else {
+            textarea.value = '';
         }
     }
     function toggleRespuestas(id) {
-        const respuestas = document.getElementById('respuestas-' + id);
-        if (!respuestas) return;
-        if (respuestas.dataset.loaded === 'true') {
-            respuestas.style.display = respuestas.style.display === 'none' ? 'block' : 'none';
-            return;
+        const contenedor = document.getElementById('respuestas-' + id);
+        if (contenedor.style.display === 'none') {
+            // Cargar respuestas por AJAX
+            fetch('index.php?view=comentario&id_publicacion=<?php echo $publicacion['publicacion']['id_publicacion']; ?>&parent_id=' + id)
+                .then(r => r.text())
+                .then(html => {
+                    contenedor.innerHTML = html;
+                    contenedor.style.display = 'block';
+                });
+        } else {
+            contenedor.style.display = 'none';
         }
-        fetch(`index.php?view=comentario&id_publicacion=<?php echo $publicacion['publicacion']['id_publicacion']; ?>&parent_id=${id}`)
-            .then(res => res.text())
-            .then(html => {
-                respuestas.innerHTML = html;
-                respuestas.style.display = 'block';
-                respuestas.dataset.loaded = 'true';
-            });
     }
     function eliminarComentario(id) {
-        if (confirm('¿Seguro que deseas eliminar este comentario?')) {
-            const form = document.createElement('form');
+        if (confirm('¿Estás seguro de que deseas eliminar este comentario?')) {
+            var form = document.createElement('form');
             form.method = 'post';
-            form.action = '';
-            const input = document.createElement('input');
+            form.action = window.location.href;
+            var input = document.createElement('input');
             input.type = 'hidden';
             input.name = 'eliminar_comentario';
             input.value = id;

@@ -26,59 +26,6 @@ if (isset($_SESSION['mensaje'])) {
     unset($_SESSION['tipo_mensaje']);
 }
 
-// Manejar peticiones POST
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['crear'])) {
-        $descripcion = $_POST['descripcion'] ?? '';
-        $usuario_id = $_POST['usuario_id'] ?? '';
-        
-        // Manejo de la imagen
-        $imagen_url = '';
-        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = 'uploads/';
-            if (!file_exists($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
-            
-            $fileName = uniqid() . '_' . basename($_FILES['imagen']['name']);
-            $targetPath = $uploadDir . $fileName;
-            
-            if (move_uploaded_file($_FILES['imagen']['tmp_name'], $targetPath)) {
-                $imagen_url = $targetPath;
-            } else {
-                $_SESSION['mensaje'] = 'Error al subir la imagen';
-                $_SESSION['tipo_mensaje'] = 'danger';
-                header('Location: index.php?view=publicacion');
-                exit;
-            }
-        }
-
-        if (!empty($descripcion) && !empty($usuario_id)) {
-            $resultado = $controller->crear($descripcion, $imagen_url, $usuario_id);
-            $_SESSION['mensaje'] = $resultado['success'] ? 'Publicación creada correctamente' : ($resultado['message'] ?? 'Error al crear la publicación');
-            $_SESSION['tipo_mensaje'] = $resultado['success'] ? 'success' : 'danger';
-        } else {
-            $_SESSION['mensaje'] = 'Todos los campos son requeridos';
-            $_SESSION['tipo_mensaje'] = 'danger';
-        }
-        header('Location: index.php?view=publicacion');
-        exit;
-    }
-    else if (isset($_POST['eliminar'])) {
-        $id_publicacion = $_POST['id_publicacion'] ?? '';
-        if (!empty($id_publicacion)) {
-            $resultado = $controller->eliminar($id_publicacion);
-            $_SESSION['mensaje'] = $resultado['success'] ? 'Publicación eliminada correctamente' : ($resultado['message'] ?? 'Error al eliminar la publicación');
-            $_SESSION['tipo_mensaje'] = $resultado['success'] ? 'success' : 'danger';
-        } else {
-            $_SESSION['mensaje'] = 'ID de publicación no proporcionado';
-            $_SESSION['tipo_mensaje'] = 'danger';
-        }
-        header('Location: index.php?view=publicacion');
-        exit;
-    }
-}
-
 // Obtener lista de usuarios
 $usuarios = $controller->obtenerUsuarios();
 if (isset($usuarios['error'])) {
@@ -516,13 +463,12 @@ if (isset($publicaciones['error'])) {
                                 <span>Comentar</span>
                             </a>
                             <?php if (
-                                $_SESSION['usuario_actual']['rol'] === 'admin' || 
-                                $_SESSION['usuario_actual']['id'] == $publicacion['usuario_id']
+                                $_SESSION['usuario_actual']['rol'] === 'admin'
                             ): ?>
-                                <button class="btn btn-click accion-btn" onclick="eliminarModal(<?php echo $publicacion['id_publicacion']; ?>)">
-                                    <i class="bi bi-trash"></i>
-                                    <span>Eliminar</span>
-                                </button>
+                                <form method="post" style="display:inline;" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta publicación?');">
+                                    <input type="hidden" name="id_publicacion" value="<?php echo $publicacion['id_publicacion']; ?>">
+                                    <button type="submit" name="eliminar">Eliminar</button>
+                                </form>
                             <?php endif; ?>
                             <button class="btn btn-click-dark btn-sm btn-like"
                                     data-publicacion-id="<?php echo $publicacion['id_publicacion']; ?>"
@@ -580,28 +526,6 @@ if (isset($publicaciones['error'])) {
                         <div class="modal-footer">
                             <button type="button" class="btn btn-click-dark" data-bs-dismiss="modal">Cerrar</button>
                             <button type="submit" class="btn btn-click" name="crear">Crear</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para eliminar publicación -->
-    <div class="modal fade" id="eliminarPublicacionModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Eliminar Publicación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="index.php?view=publicacion" method="post" id="formEliminar">
-                        <input type="hidden" id="id_publicacion_eliminar" name="id_publicacion" value="">
-                        <p>¿Estás seguro de que deseas eliminar esta publicación?</p>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-click-dark" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-click" name="eliminar">Eliminar</button>
                         </div>
                     </form>
                 </div>
@@ -729,4 +653,7 @@ if (isset($publicaciones['error'])) {
         }
     </style>
 </body>
+<?php if (isset($_SESSION['debug_msg'])): ?>
+<script>console.log(<?php echo json_encode($_SESSION['debug_msg']); ?>);</script>
+<?php unset($_SESSION['debug_msg']); endif; ?>
 </html>

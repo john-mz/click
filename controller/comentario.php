@@ -15,6 +15,19 @@ class ComentarioController {
         return $this->comentario->obtenerRespuestas($comentario_id);
     }
 
+    public function obtenerRespuestasAnidadas($parent_id) {
+        $respuestas = $this->obtenerRespuestas($parent_id);
+        $todas = [];
+        foreach ($respuestas as $respuesta) {
+            $todas[] = $respuesta;
+            $hijas = $this->obtenerRespuestasAnidadas($respuesta['id_comentario']);
+            foreach ($hijas as $hija) {
+                $todas[] = $hija;
+            }
+        }
+        return $todas;
+    }
+
     public function agregarComentario($comentario, $usuario_id, $publicacion_id, $parent_id = null) {
         return $this->comentario->insertar($comentario, $usuario_id, $publicacion_id, $parent_id);
     }

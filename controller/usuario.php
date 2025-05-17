@@ -128,7 +128,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    if (isset($_POST['eliminar'])) {
+    if (isset($_POST['eliminar']) && isset($_POST['id_usuario'])) {
+        error_log("[DEBUG] Eliminando usuario: " . print_r($_POST, true));
         $admin_id = $_SESSION['usuario_actual']['id'];        
         $id_usuario = $_POST['id_usuario'];
         // $usuario->setAdminIdSql($adminId);

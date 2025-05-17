@@ -72,10 +72,47 @@ $usuarios = $usuarioController->obtenerUsuarios();
 // Manejar peticiones POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['crear'])) {
-        // ... código existente ...
+        $descripcion = $_POST['descripcion'] ?? '';
+        $usuario_id = $_POST['usuario_id'] ?? '';
+        $imagen_url = '';
+        if (isset($_FILES['imagen']) && $_FILES['imagen']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = 'uploads/';
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            $fileName = uniqid() . '_' . basename($_FILES['imagen']['name']);
+            $targetPath = $uploadDir . $fileName;
+            if (move_uploaded_file($_FILES['imagen']['tmp_name'], $targetPath)) {
+                $imagen_url = $targetPath;
+            } else {
+                $_SESSION['mensaje'] = 'Error al subir la imagen';
+                $_SESSION['tipo_mensaje'] = 'danger';
+                header('Location: index.php?view=publicacion');
+                exit;
+            }
+        }
+        $controller = new PublicacionController();
+        $controller->setUsuarioActual($_SESSION['usuario_actual']);
+        if (!empty($descripcion) && !empty($usuario_id)) {
+            $resultado = $controller->crear($descripcion, $imagen_url, $usuario_id);
+            $_SESSION['mensaje'] = $resultado['success'] ? 'Publicación creada correctamente' : ($resultado['message'] ?? 'Error al crear la publicación');
+            $_SESSION['tipo_mensaje'] = $resultado['success'] ? 'success' : 'danger';
+        } else {
+            $_SESSION['mensaje'] = 'Todos los campos son requeridos';
+            $_SESSION['tipo_mensaje'] = 'danger';
+        }
+        header('Location: index.php?view=publicacion');
+        exit;
     }
-    else if (isset($_POST['eliminar'])) {
-        // ... código existente ...
+    else if (isset($_POST['eliminar']) && isset($_POST['id_publicacion'])) {
+        $controller = new PublicacionController();
+        $controller->setUsuarioActual($_SESSION['usuario_actual']);
+        $id_publicacion = $_POST['id_publicacion'];
+        $resultado = $controller->eliminar($id_publicacion);
+        $_SESSION['mensaje'] = $resultado['success'] ? 'Publicación eliminada correctamente' : ($resultado['message'] ?? 'Error al eliminar la publicación');
+        $_SESSION['tipo_mensaje'] = $resultado['success'] ? 'success' : 'danger';
+        header('Location: index.php?view=publicacion');
+        exit;
     }
     else if (isset($_POST['publicacion_id']) && isset($_POST['tipo'])) {
         // Manejar reacción
@@ -450,9 +487,9 @@ if (!isset($_GET['view']) || $_GET['view'] === 'index') {
                 if (!isset($publicacion)) {
                     $publicacion = ['publicacion' => ['usuario_id' => null]];
                 }
-                $respuestas = $controllerComentario->obtenerRespuestas($_GET['parent_id']);
+                $respuestas = $controllerComentario->obtenerRespuestasAnidadas($_GET['parent_id']);
                 foreach ($respuestas as $respuesta) {
-                    echo '<div class="respuesta-box" id="comentario-' . $respuesta['id_comentario'] . '">';
+                    echo '<div class="comentario-box" id="comentario-' . $respuesta['id_comentario'] . '">';
                     echo '<div class="comentario-header">';
                     echo '<i class="bi bi-person-circle me-2"></i>';
                     echo '<span class="autor">' . htmlspecialchars($respuesta['nombre_usuario']) . '</span>';
@@ -460,9 +497,9 @@ if (!isset($_GET['view']) || $_GET['view'] === 'index') {
                     echo '</div>';
                     echo '<div class="comentario-contenido">' . mostrarAt($respuesta['comentario'], $usuario_actual['nombre']) . '</div>';
                     echo '<div class="comentario-acciones">';
-                    echo '<button type="button" class="btn btn-click accion-btn" onclick="mostrarFormularioRespuesta(' . $respuesta['id_comentario'] . ', \'' . addslashes(htmlspecialchars($respuesta['nombre_usuario'], ENT_QUOTES, 'UTF-8')) . '\', true)"><i class="bi bi-reply"></i> <span>Responder</span></button>';
+                    echo '<button type="button" class="btn btn-link btn-responder p-0" onclick="mostrarFormularioRespuesta(' . $respuesta['id_comentario'] . ', \'' . addslashes(htmlspecialchars($respuesta['nombre_usuario'], ENT_QUOTES, 'UTF-8')) . '\', true)"><i class="bi bi-reply"></i> <span>Responder</span></button>';
                     if (puedeEliminarComentario($respuesta, $usuario_actual, $publicacion)) {
-                        echo '<button type="button" class="btn btn-click accion-btn" onclick="eliminarComentario(' . $respuesta['id_comentario'] . ')"><i class="bi bi-trash"></i> <span>Eliminar</span></button>';
+                        echo '<button type="button" class="btn btn-danger btn-sm ms-2" onclick="eliminarComentario(' . $respuesta['id_comentario'] . ')"><i class="bi bi-trash"></i> <span>Eliminar</span></button>';
                     }
                     echo '</div>';
                     // Formulario oculto para responder a la respuesta
