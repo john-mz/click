@@ -1,0 +1,52 @@
+[
+    {
+        "id_publicacion": "227",
+        "descripcion": "Publicaci\u00f3n n\u00famero 9451",
+        "imagen_url": "https:\/\/imgur.com\/gallery\/1774",
+        "fecha_creacion": "2024-11-16 00:00:00",
+        "usuario_id": "273",
+        "nombre_usuario": "Usuario 2811",
+        "meGusta": "281",
+        "noMeGusta": "226"
+    },
+    {
+        "id_publicacion": "311",
+        "descripcion": "Publicaci\u00f3n n\u00famero 9744",
+        "imagen_url": "https:\/\/imgur.com\/gallery\/9811",
+        "fecha_creacion": "2024-12-29 00:00:00",
+        "usuario_id": "119",
+        "nombre_usuario": "Usuario 387",
+        "meGusta": "280",
+        "noMeGusta": "227"
+    },
+    {
+        "id_publicacion": "76",
+        "descripcion": "Publicaci\u00f3n n\u00famero 1202",
+        "imagen_url": "https:\/\/imgur.com\/gallery\/8522",
+        "fecha_creacion": "2024-12-10 00:00:00",
+        "usuario_id": "466",
+        "nombre_usuario": "Usuario 5747",
+        "meGusta": "280",
+        "noMeGusta": "225"
+    },
+    {
+        "id_publicacion": "241",
+        "descripcion": "Publicaci\u00f3n n\u00famero 9541",
+        "imagen_url": "https:\/\/imgur.com\/gallery\/8502",
+        "fecha_creacion": "2024-11-02 00:00:00",
+        "usuario_id": "273",
+        "nombre_usuario": "Usuario 2811",
+        "meGusta": "279",
+        "noMeGusta": "228"
+    },
+    {
+        "id_publicacion": "14",
+        "descripcion": "Publicaci\u00f3n n\u00famero 221",
+        "imagen_url": "https:\/\/imgur.com\/gallery\/834",
+        "fecha_creacion": "2025-02-10 00:00:00",
+        "usuario_id": "429",
+        "nombre_usuario": "Usuario 5066",
+        "meGusta": "279",
+        "noMeGusta": "228"
+    }
+]

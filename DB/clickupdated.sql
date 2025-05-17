@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 05-05-2025 a las 17:21:04
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.0.30
+-- Host: 127.0.0.1
+-- Generation Time: May 17, 2025 at 02:57 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,12 +18,12 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `clickupdated`
+-- Database: `clickupdated`
 --
 
 DELIMITER $$
 --
--- Procedimientos
+-- Procedures
 --
 CREATE DEFINER=`root`@`localhost` PROCEDURE `ActualizarDescripcion` (IN `id` INT, IN `descripcion` VARCHAR(250))   BEGIN
 	UPDATE publicacion SET descripcion = descripcion WHERE id_publicacion = id;
@@ -50,7 +50,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `SeleccionarUsuarios` ()   BEGIN
 END$$
 
 --
--- Funciones
+-- Functions
 --
 CREATE DEFINER=`root`@`localhost` FUNCTION `cantidadLikes` (`id` INT) RETURNS INT(11) DETERMINISTIC BEGIN
 	DECLARE contador INT;
@@ -87,7 +87,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `actualizar_ranking_publicaciones`
+-- Table structure for table `actualizar_ranking_publicaciones`
 --
 
 CREATE TABLE `actualizar_ranking_publicaciones` (
@@ -98,7 +98,7 @@ CREATE TABLE `actualizar_ranking_publicaciones` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `auditoriapublicacion`
+-- Table structure for table `auditoriapublicacion`
 --
 
 CREATE TABLE `auditoriapublicacion` (
@@ -109,7 +109,7 @@ CREATE TABLE `auditoriapublicacion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Volcado de datos para la tabla `auditoriapublicacion`
+-- Dumping data for table `auditoriapublicacion`
 --
 
 INSERT INTO `auditoriapublicacion` (`id`, `id_publicacion`, `evento`, `fecha`) VALUES
@@ -119,12 +119,14 @@ INSERT INTO `auditoriapublicacion` (`id`, `id_publicacion`, `evento`, `fecha`) V
 (4, 385, 'Publicacion Creada', '2025-03-14 05:04:01'),
 (5, 386, 'Publicacion Creada', '2025-03-15 17:12:41'),
 (6, 387, 'Publicacion Creada', '2025-03-15 19:56:26'),
-(7, 388, 'Publicacion Creada', '2025-04-22 09:09:29');
+(7, 388, 'Publicacion Creada', '2025-04-22 09:09:29'),
+(8, 389, 'Publicacion Creada', '2025-05-13 12:10:30'),
+(9, 390, 'Publicacion Creada', '2025-05-13 13:50:27');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `auditoriausuario`
+-- Table structure for table `auditoriausuario`
 --
 
 CREATE TABLE `auditoriausuario` (
@@ -136,7 +138,7 @@ CREATE TABLE `auditoriausuario` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Volcado de datos para la tabla `auditoriausuario`
+-- Dumping data for table `auditoriausuario`
 --
 
 INSERT INTO `auditoriausuario` (`id`, `id_admin`, `id_usuario`, `evento`, `fecha`) VALUES
@@ -158,12 +160,13 @@ INSERT INTO `auditoriausuario` (`id`, `id_admin`, `id_usuario`, `evento`, `fecha
 (22, 2, 522, 'Usuario Insertado', '2025-05-05 10:19:13'),
 (23, 2, 521, 'Usuario Eliminado', '2025-05-05 10:19:37'),
 (24, 2, 23, 'Usuario Eliminado', '2025-05-05 10:19:40'),
-(25, 2, 523, 'Usuario Insertado', '2025-05-05 10:20:01');
+(25, 2, 523, 'Usuario Insertado', '2025-05-05 10:20:01'),
+(26, 1, 2, 'Usuario Editado', '2025-05-05 10:22:15');
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `comentario`
+-- Table structure for table `comentario`
 --
 
 CREATE TABLE `comentario` (
@@ -176,7 +179,7 @@ CREATE TABLE `comentario` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Volcado de datos para la tabla `comentario`
+-- Dumping data for table `comentario`
 --
 
 INSERT INTO `comentario` (`id_comentario`, `parent_id`, `comentario`, `fecha_comentario`, `usuario_id`, `publicacion_id`) VALUES
@@ -523,10 +526,12 @@ INSERT INTO `comentario` (`id_comentario`, `parent_id`, `comentario`, `fecha_com
 (381, NULL, 'Comentario número 7412', '2024-10-22 00:00:00', 352, 118),
 (382, NULL, 'Comentario número 618', '2024-10-21 00:00:00', 464, 106),
 (384, NULL, 'ASDFS', '2025-03-15 17:20:06', 483, 13),
-(387, NULL, 'mi gei comentario', '2025-03-15 20:01:17', 180, 49);
+(387, NULL, 'mi gei comentario', '2025-03-15 20:01:17', 180, 49),
+(388, NULL, 'asdfsdf', '2025-05-13 12:10:35', 1, 389),
+(389, 388, 'asdfsdf', '2025-05-13 12:10:39', 1, 389);
 
 --
--- Disparadores `comentario`
+-- Triggers `comentario`
 --
 DELIMITER $$
 CREATE TRIGGER `before_edit_comentario` BEFORE UPDATE ON `comentario` FOR EACH ROW BEGIN
@@ -540,7 +545,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `conteo`
+-- Table structure for table `conteo`
 --
 
 CREATE TABLE `conteo` (
@@ -550,7 +555,7 @@ CREATE TABLE `conteo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Volcado de datos para la tabla `conteo`
+-- Dumping data for table `conteo`
 --
 
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
@@ -107436,7 +107441,6 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (75, 516, 2),
 (75, 517, 2),
 (75, 519, 2),
-(76, 1, 2),
 (76, 2, 2),
 (76, 30, 2),
 (76, 31, 2),
@@ -109053,9 +109057,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (82, 356, 2),
 (82, 358, 2),
 (82, 363, 2),
-(82, 365, 2);
+(82, 365, 2),
+(82, 366, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(82, 366, 2),
 (82, 368, 2),
 (82, 370, 2),
 (82, 371, 2),
@@ -113253,9 +113257,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (100, 429, 2),
 (100, 431, 2),
 (100, 432, 2),
-(100, 434, 2);
+(100, 434, 2),
+(100, 437, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(100, 437, 2),
 (100, 441, 2),
 (100, 442, 2),
 (100, 446, 2),
@@ -117144,9 +117148,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (116, 332, 2),
 (116, 333, 2),
 (116, 334, 2),
-(116, 335, 2);
+(116, 335, 2),
+(116, 338, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(116, 338, 2),
 (116, 341, 2),
 (116, 347, 2),
 (116, 350, 2),
@@ -121037,9 +121041,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (135, 122, 2),
 (135, 129, 2),
 (135, 130, 2),
-(135, 131, 2);
+(135, 131, 2),
+(135, 133, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(135, 133, 2),
 (135, 134, 2),
 (135, 135, 2),
 (135, 136, 2),
@@ -124927,9 +124931,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (151, 154, 2),
 (151, 156, 2),
 (151, 157, 2),
-(151, 159, 2);
+(151, 159, 2),
+(151, 160, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(151, 160, 2),
 (151, 162, 2),
 (151, 164, 2),
 (151, 165, 2),
@@ -128816,9 +128820,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (166, 382, 2),
 (166, 384, 2),
 (166, 385, 2),
-(166, 388, 2);
+(166, 388, 2),
+(166, 389, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(166, 389, 2),
 (166, 391, 2),
 (166, 392, 2),
 (166, 398, 2),
@@ -132704,9 +132708,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (183, 334, 2),
 (183, 335, 2),
 (183, 336, 2),
-(183, 337, 2);
+(183, 337, 2),
+(183, 338, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(183, 338, 2),
 (183, 346, 2),
 (183, 347, 2),
 (183, 348, 2),
@@ -136593,9 +136597,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (199, 271, 2),
 (199, 272, 2),
 (199, 275, 2),
-(199, 276, 2);
+(199, 276, 2),
+(199, 278, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(199, 278, 2),
 (199, 279, 2),
 (199, 282, 2),
 (199, 284, 2),
@@ -140485,9 +140489,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (215, 95, 2),
 (215, 97, 2),
 (215, 98, 2),
-(215, 107, 2);
+(215, 107, 2),
+(215, 108, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(215, 108, 2),
 (215, 112, 2),
 (215, 113, 2),
 (215, 114, 2),
@@ -144373,9 +144377,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (230, 391, 2),
 (230, 392, 2),
 (230, 395, 2),
-(230, 398, 2);
+(230, 398, 2),
+(230, 400, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(230, 400, 2),
 (230, 402, 2),
 (230, 404, 2),
 (230, 406, 2),
@@ -148261,9 +148265,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (247, 236, 2),
 (247, 237, 2),
 (247, 238, 2),
-(247, 240, 2);
+(247, 240, 2),
+(247, 245, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(247, 245, 2),
 (247, 246, 2),
 (247, 247, 2),
 (247, 252, 2),
@@ -152152,9 +152156,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (266, 81, 2),
 (266, 83, 2),
 (266, 85, 2),
-(266, 86, 2);
+(266, 86, 2),
+(266, 87, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(266, 87, 2),
 (266, 88, 2),
 (266, 89, 2),
 (266, 91, 2),
@@ -156040,9 +156044,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (281, 490, 2),
 (281, 492, 2),
 (281, 493, 2),
-(281, 494, 2);
+(281, 494, 2),
+(281, 496, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(281, 496, 2),
 (281, 497, 2),
 (281, 499, 2),
 (281, 501, 2),
@@ -159931,9 +159935,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (297, 404, 2),
 (297, 406, 2),
 (297, 408, 2),
-(297, 409, 2);
+(297, 409, 2),
+(297, 412, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(297, 412, 2),
 (297, 413, 2),
 (297, 414, 2),
 (297, 418, 2),
@@ -163821,9 +163825,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (314, 409, 2),
 (314, 410, 2),
 (314, 412, 2),
-(314, 415, 2);
+(314, 415, 2),
+(314, 418, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(314, 418, 2),
 (314, 420, 2),
 (314, 422, 2),
 (314, 426, 2),
@@ -167710,9 +167714,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (330, 231, 2),
 (330, 232, 2),
 (330, 233, 2),
-(330, 234, 2);
+(330, 234, 2),
+(330, 235, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(330, 235, 2),
 (330, 237, 2),
 (330, 241, 2),
 (330, 242, 2),
@@ -171599,9 +171603,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (346, 210, 2),
 (346, 211, 2),
 (346, 212, 2),
-(346, 213, 2);
+(346, 213, 2),
+(346, 214, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(346, 214, 2),
 (346, 216, 2),
 (346, 217, 2),
 (346, 218, 2),
@@ -175485,9 +175489,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (362, 487, 2),
 (362, 489, 2),
 (362, 490, 2),
-(362, 491, 2);
+(362, 491, 2),
+(362, 492, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(362, 492, 2),
 (362, 493, 2),
 (362, 497, 2),
 (362, 501, 2),
@@ -179375,9 +179379,9 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 (378, 343, 2),
 (378, 345, 2),
 (378, 346, 2),
-(378, 347, 2);
+(378, 347, 2),
+(378, 349, 2);
 INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
-(378, 349, 2),
 (378, 350, 2),
 (378, 352, 2),
 (378, 353, 2),
@@ -180182,7 +180186,7 @@ INSERT INTO `conteo` (`id_publicacion`, `id_usuario`, `id_reaccion`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `conteoreal`
+-- Table structure for table `conteoreal`
 --
 
 CREATE TABLE `conteoreal` (
@@ -180192,7 +180196,7 @@ CREATE TABLE `conteoreal` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Volcado de datos para la tabla `conteoreal`
+-- Dumping data for table `conteoreal`
 --
 
 INSERT INTO `conteoreal` (`id_publicacion`, `meGusta`, `noMeGusta`) VALUES
@@ -180518,7 +180522,7 @@ INSERT INTO `conteoreal` (`id_publicacion`, `meGusta`, `noMeGusta`) VALUES
 (166, 264, 243),
 (211, 248, 259),
 (160, 255, 252),
-(76, 281, 226),
+(76, 280, 225),
 (167, 241, 266),
 (297, 276, 231),
 (331, 264, 243),
@@ -180580,12 +180584,13 @@ INSERT INTO `conteoreal` (`id_publicacion`, `meGusta`, `noMeGusta`) VALUES
 (385, 0, 0),
 (385, 0, 0),
 (385, 0, 0),
-(385, 0, 0);
+(385, 0, 0),
+(76, 0, 0);
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `publicacion`
+-- Table structure for table `publicacion`
 --
 
 CREATE TABLE `publicacion` (
@@ -180597,7 +180602,7 @@ CREATE TABLE `publicacion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Volcado de datos para la tabla `publicacion`
+-- Dumping data for table `publicacion`
 --
 
 INSERT INTO `publicacion` (`id_publicacion`, `descripcion`, `imagen_url`, `fecha_creacion`, `usuario_id`) VALUES
@@ -180969,10 +180974,12 @@ INSERT INTO `publicacion` (`id_publicacion`, `descripcion`, `imagen_url`, `fecha
 (385, 'asdfsdasdf', 'asdfsdfsdf', '2025-03-14 05:04:01', 1),
 (386, 'ASDFDS', 'ASDFASDF', '2025-03-15 17:12:41', 490),
 (387, 'hola esta es mi descripcion', 'url.test', '2025-03-15 19:56:26', 1),
-(388, 'mi prueba', '', '2025-04-22 09:09:29', 1);
+(388, 'mi prueba', '', '2025-04-22 09:09:29', 1),
+(389, 'asdfsdf', '', '2025-05-13 12:10:30', 1),
+(390, 'asdfsdf', '', '2025-05-13 13:50:27', 2);
 
 --
--- Disparadores `publicacion`
+-- Triggers `publicacion`
 --
 DELIMITER $$
 CREATE TRIGGER `after_delete_publicacion` AFTER DELETE ON `publicacion` FOR EACH ROW BEGIN
@@ -180992,7 +180999,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `reaccion`
+-- Table structure for table `reaccion`
 --
 
 CREATE TABLE `reaccion` (
@@ -181001,7 +181008,7 @@ CREATE TABLE `reaccion` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Volcado de datos para la tabla `reaccion`
+-- Dumping data for table `reaccion`
 --
 
 INSERT INTO `reaccion` (`id_reaccion`, `nombre_reaccion`) VALUES
@@ -181011,7 +181018,7 @@ INSERT INTO `reaccion` (`id_reaccion`, `nombre_reaccion`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `rol`
+-- Table structure for table `rol`
 --
 
 CREATE TABLE `rol` (
@@ -181020,7 +181027,7 @@ CREATE TABLE `rol` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Volcado de datos para la tabla `rol`
+-- Dumping data for table `rol`
 --
 
 INSERT INTO `rol` (`id_rol`, `nombre_rol`) VALUES
@@ -181030,7 +181037,24 @@ INSERT INTO `rol` (`id_rol`, `nombre_rol`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `usuario`
+-- Stand-in structure for view `tendencias`
+-- (See below for the actual view)
+--
+CREATE TABLE `tendencias` (
+`id_publicacion` int(11)
+,`descripcion` varchar(250)
+,`imagen_url` varchar(255)
+,`fecha_creacion` datetime
+,`usuario_id` int(11)
+,`nombre_usuario` varchar(250)
+,`meGusta` int(11)
+,`noMeGusta` int(11)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `usuario`
 --
 
 CREATE TABLE `usuario` (
@@ -181043,12 +181067,12 @@ CREATE TABLE `usuario` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
--- Volcado de datos para la tabla `usuario`
+-- Dumping data for table `usuario`
 --
 
 INSERT INTO `usuario` (`id_usuario`, `nombre`, `email`, `password`, `fecha_registro`, `rol_id`) VALUES
 (1, 'John', 'johnstiven40@gmail.com', '123', '2025-02-17 14:57:14', 1),
-(2, 'Ospia', 'ospina@gmail.com', '123', '2025-02-17 14:57:43', 1),
+(2, 'Ospiaadsfsd', 'ospina@gmail.com', '123', '2025-02-17 14:57:43', 1),
 (24, 'Usuario 32893', 'usuario4751@gmail.com', '123', '2025-02-11 00:00:00', 1),
 (25, 'Usuario 3890', 'usuario5197@gmail.com', '123', '2025-02-10 00:00:00', 2),
 (26, 'Usuario 4316', 'usuario5991@gmail.com', '123', '2025-02-09 00:00:00', 2),
@@ -181544,7 +181568,7 @@ INSERT INTO `usuario` (`id_usuario`, `nombre`, `email`, `password`, `fecha_regis
 (523, 'naaaa', 'naa@gmail.com', '321', '2025-05-05 10:20:01', 2);
 
 --
--- Disparadores `usuario`
+-- Triggers `usuario`
 --
 DELIMITER $$
 CREATE TRIGGER `after_delete_usuario` AFTER DELETE ON `usuario` FOR EACH ROW BEGIN
@@ -181571,8 +181595,8 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Estructura Stand-in para la vista `vista_conteoreal`
--- (Véase abajo para la vista actual)
+-- Stand-in structure for view `vista_conteoreal`
+-- (See below for the actual view)
 --
 CREATE TABLE `vista_conteoreal` (
 `id_publicacion` int(11)
@@ -181583,8 +181607,8 @@ CREATE TABLE `vista_conteoreal` (
 -- --------------------------------------------------------
 
 --
--- Estructura Stand-in para la vista `vista_descripcion_publicacion`
--- (Véase abajo para la vista actual)
+-- Stand-in structure for view `vista_descripcion_publicacion`
+-- (See below for the actual view)
 --
 CREATE TABLE `vista_descripcion_publicacion` (
 `id_publicacion` int(11)
@@ -181595,7 +181619,16 @@ CREATE TABLE `vista_descripcion_publicacion` (
 -- --------------------------------------------------------
 
 --
--- Estructura para la vista `vista_conteoreal`
+-- Structure for view `tendencias`
+--
+DROP TABLE IF EXISTS `tendencias`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `tendencias`  AS SELECT `p`.`id_publicacion` AS `id_publicacion`, `p`.`descripcion` AS `descripcion`, `p`.`imagen_url` AS `imagen_url`, `p`.`fecha_creacion` AS `fecha_creacion`, `p`.`usuario_id` AS `usuario_id`, `u`.`nombre` AS `nombre_usuario`, coalesce(`cr`.`meGusta`,0) AS `meGusta`, coalesce(`cr`.`noMeGusta`,0) AS `noMeGusta` FROM ((`publicacion` `p` left join `usuario` `u` on(`p`.`usuario_id` = `u`.`id_usuario`)) left join `conteoreal` `cr` on(`p`.`id_publicacion` = `cr`.`id_publicacion`)) GROUP BY `p`.`id_publicacion`, `p`.`descripcion`, `p`.`imagen_url`, `p`.`fecha_creacion`, `p`.`usuario_id`, `u`.`nombre`, `cr`.`meGusta`, `cr`.`noMeGusta` ORDER BY coalesce(`cr`.`meGusta`,0) DESC LIMIT 0, 5 ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `vista_conteoreal`
 --
 DROP TABLE IF EXISTS `vista_conteoreal`;
 
@@ -181604,25 +181637,25 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Estructura para la vista `vista_descripcion_publicacion`
+-- Structure for view `vista_descripcion_publicacion`
 --
 DROP TABLE IF EXISTS `vista_descripcion_publicacion`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_descripcion_publicacion`  AS SELECT `publicacion`.`id_publicacion` AS `id_publicacion`, `publicacion`.`descripcion` AS `descripcion`, `conteoreal`.`meGusta` AS `meGusta` FROM (`publicacion` join `conteoreal` on(`publicacion`.`id_publicacion` = `conteoreal`.`id_publicacion`)) WHERE `conteoreal`.`meGusta` > 200 ;
 
 --
--- Índices para tablas volcadas
+-- Indexes for dumped tables
 --
 
 --
--- Indices de la tabla `auditoriapublicacion`
+-- Indexes for table `auditoriapublicacion`
 --
 ALTER TABLE `auditoriapublicacion`
   ADD PRIMARY KEY (`id`),
   ADD KEY `id_publicacion` (`id_publicacion`);
 
 --
--- Indices de la tabla `auditoriausuario`
+-- Indexes for table `auditoriausuario`
 --
 ALTER TABLE `auditoriausuario`
   ADD PRIMARY KEY (`id`),
@@ -181630,7 +181663,7 @@ ALTER TABLE `auditoriausuario`
   ADD KEY `id_usuario` (`id_usuario`);
 
 --
--- Indices de la tabla `comentario`
+-- Indexes for table `comentario`
 --
 ALTER TABLE `comentario`
   ADD PRIMARY KEY (`id_comentario`),
@@ -181638,7 +181671,7 @@ ALTER TABLE `comentario`
   ADD KEY `usuario_id_fk` (`usuario_id`);
 
 --
--- Indices de la tabla `conteo`
+-- Indexes for table `conteo`
 --
 ALTER TABLE `conteo`
   ADD UNIQUE KEY `unique_reaccion` (`id_publicacion`,`id_usuario`),
@@ -181647,102 +181680,102 @@ ALTER TABLE `conteo`
   ADD KEY `id_publicacion_fk` (`id_publicacion`);
 
 --
--- Indices de la tabla `conteoreal`
+-- Indexes for table `conteoreal`
 --
 ALTER TABLE `conteoreal`
   ADD KEY `id_publicacion_fk` (`id_publicacion`);
 
 --
--- Indices de la tabla `publicacion`
+-- Indexes for table `publicacion`
 --
 ALTER TABLE `publicacion`
   ADD PRIMARY KEY (`id_publicacion`),
   ADD KEY `admin_id_fk` (`usuario_id`);
 
 --
--- Indices de la tabla `reaccion`
+-- Indexes for table `reaccion`
 --
 ALTER TABLE `reaccion`
   ADD PRIMARY KEY (`id_reaccion`);
 
 --
--- Indices de la tabla `rol`
+-- Indexes for table `rol`
 --
 ALTER TABLE `rol`
   ADD PRIMARY KEY (`id_rol`);
 
 --
--- Indices de la tabla `usuario`
+-- Indexes for table `usuario`
 --
 ALTER TABLE `usuario`
   ADD PRIMARY KEY (`id_usuario`),
   ADD KEY `rol_id_fk` (`rol_id`);
 
 --
--- AUTO_INCREMENT de las tablas volcadas
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT de la tabla `auditoriapublicacion`
+-- AUTO_INCREMENT for table `auditoriapublicacion`
 --
 ALTER TABLE `auditoriapublicacion`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT de la tabla `auditoriausuario`
+-- AUTO_INCREMENT for table `auditoriausuario`
 --
 ALTER TABLE `auditoriausuario`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
--- AUTO_INCREMENT de la tabla `comentario`
+-- AUTO_INCREMENT for table `comentario`
 --
 ALTER TABLE `comentario`
-  MODIFY `id_comentario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=388;
+  MODIFY `id_comentario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=390;
 
 --
--- AUTO_INCREMENT de la tabla `publicacion`
+-- AUTO_INCREMENT for table `publicacion`
 --
 ALTER TABLE `publicacion`
-  MODIFY `id_publicacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=389;
+  MODIFY `id_publicacion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=391;
 
 --
--- AUTO_INCREMENT de la tabla `reaccion`
+-- AUTO_INCREMENT for table `reaccion`
 --
 ALTER TABLE `reaccion`
   MODIFY `id_reaccion` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT de la tabla `rol`
+-- AUTO_INCREMENT for table `rol`
 --
 ALTER TABLE `rol`
   MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT de la tabla `usuario`
+-- AUTO_INCREMENT for table `usuario`
 --
 ALTER TABLE `usuario`
   MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=524;
 
 --
--- Restricciones para tablas volcadas
+-- Constraints for dumped tables
 --
 
 --
--- Filtros para la tabla `auditoriausuario`
+-- Constraints for table `auditoriausuario`
 --
 ALTER TABLE `auditoriausuario`
   ADD CONSTRAINT `auditoriausuario_ibfk_1` FOREIGN KEY (`id_admin`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `comentario`
+-- Constraints for table `comentario`
 --
 ALTER TABLE `comentario`
   ADD CONSTRAINT `comentario_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE,
   ADD CONSTRAINT `comentario_ibfk_2` FOREIGN KEY (`publicacion_id`) REFERENCES `publicacion` (`id_publicacion`) ON DELETE CASCADE;
 
 --
--- Filtros para la tabla `conteo`
+-- Constraints for table `conteo`
 --
 ALTER TABLE `conteo`
   ADD CONSTRAINT `conteo_ibfk_1` FOREIGN KEY (`id_reaccion`) REFERENCES `reaccion` (`id_reaccion`) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -181750,26 +181783,26 @@ ALTER TABLE `conteo`
   ADD CONSTRAINT `conteo_ibfk_3` FOREIGN KEY (`id_publicacion`) REFERENCES `publicacion` (`id_publicacion`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `conteoreal`
+-- Constraints for table `conteoreal`
 --
 ALTER TABLE `conteoreal`
   ADD CONSTRAINT `conteoreal_ibfk_1` FOREIGN KEY (`id_publicacion`) REFERENCES `publicacion` (`id_publicacion`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Filtros para la tabla `publicacion`
+-- Constraints for table `publicacion`
 --
 ALTER TABLE `publicacion`
   ADD CONSTRAINT `publicacion_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id_usuario`) ON DELETE CASCADE;
 
 --
--- Filtros para la tabla `usuario`
+-- Constraints for table `usuario`
 --
 ALTER TABLE `usuario`
   ADD CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`rol_id`) REFERENCES `rol` (`id_rol`);
 
 DELIMITER $$
 --
--- Eventos
+-- Events
 --
 CREATE DEFINER=`root`@`localhost` EVENT `actualizar_ranking_publicaciones_eventos` ON SCHEDULE EVERY 24 HOUR STARTS '2025-03-14 07:01:14' ON COMPLETION NOT PRESERVE ENABLE DO BEGIN 
     TRUNCATE TABLE actualizar_ranking_publicaciones;
