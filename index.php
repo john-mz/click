@@ -181,6 +181,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: ' . $_SERVER['REQUEST_URI']);
         exit;
     }
+    else if (isset($_POST['eliminar_todas_publicaciones']) && $es_admin) {
+        $controller = new PublicacionController();
+        $controller->setUsuarioActual($_SESSION['usuario_actual']);
+        // Eliminar todas las publicaciones
+        $db = new mysqli('localhost', 'root', '', 'clickupdated');
+        $db->query('DELETE FROM publicacion');
+        $_SESSION['mensaje'] = 'Todas las publicaciones han sido eliminadas correctamente.';
+        $_SESSION['tipo_mensaje'] = 'success';
+        header('Location: index.php?view=publicacion');
+        exit;
+    }
+    else if (isset($_POST['eliminar_todos_usuarios']) && $es_admin) {
+        // Eliminar todos los usuarios
+        $db = new mysqli('localhost', 'root', '', 'clickupdated');
+        $db->query('DELETE FROM usuario');
+        $_SESSION['mensaje'] = 'Todos los usuarios han sido eliminados correctamente.';
+        $_SESSION['tipo_mensaje'] = 'success';
+        header('Location: index.php?view=usuario');
+        exit;
+    }
 }
 
 // Si no hay vista específica o es la vista de inicio, mostrar la página principal
@@ -191,270 +211,290 @@ if (!isset($_GET['view']) || $_GET['view'] === 'index') {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Inicio - Sistema de Publicaciones</title>
+        <title>Click - Social Media</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
         <style>
             :root {
-                --reddit-orange: #ff4500;
-                --reddit-dark: #1a1a1b;
-                --reddit-light: #ffffff;
-                --reddit-gray: #878a8c;
-                --reddit-gray-dark: #232324;
-                --header-height: 56px;
+                --primary-color: #1DA1F2;
+                --secondary-color: #14171A;
+                --background-color: #15202B;
+                --card-bg: #192734;
+                --text-primary: #FFFFFF;
+                --text-secondary: #8899A6;
+                --border-color: #38444D;
+                --hover-color: #1E2732;
+                --like-color: #E0245E;
+                --header-height: 60px;
             }
+
             body {
-                background: #181819;
-                color: #fff;
+                background: var(--background-color);
+                color: var(--text-primary);
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
                 min-height: 100vh;
                 margin: 0;
-                font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-                padding-top: 2rem;
             }
-            .container {
-                max-width: 800px;
-                margin: 0 auto;
-                padding: 2rem;
+
+            .app-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: var(--header-height);
+                background: rgba(21, 32, 43, 0.95);
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid var(--border-color);
+                z-index: 1000;
+                display: flex;
+                align-items: center;
+                padding: 0 1.5rem;
             }
-            .card {
-                background: #232324;
-                border: none;
-                border-radius: 12px;
-                margin-bottom: 1.5rem;
-                box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+
+            .app-logo {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                text-decoration: none;
             }
-            .card-header {
-                background: #232324;
-                border-bottom: 1px solid #333;
-                padding: 1.5rem;
-            }
-            .card-body {
-                padding: 1.5rem;
-            }
-            .btn-click {
-                background: var(--reddit-orange);
-                color: #fff !important;
-                border: none;
-                border-radius: 20px;
-                padding: 8px 24px;
-                font-weight: 500;
-                font-size: 1.1rem;
-                transition: background 0.2s;
-            }
-            .btn-click:hover {
-                background: #d93a00;
-                color: #fff !important;
-            }
-            .reddit-logo {
-                width: 38px; height: 38px;
-                margin: 0 18px 0 12px;
-                display: flex; align-items: center; justify-content: center;
-            }
-            .reddit-logo svg {
-                width: 38px; height: 38px;
-            }
-            .reddit-title {
+
+            .app-title {
                 font-size: 1.5rem;
                 font-weight: 700;
-                color: var(--reddit-orange);
-                margin-right: 24px;
+                color: var(--primary-color);
+                margin: 0;
             }
-            .reddit-search {
-                flex: 1;
-                max-width: 400px;
-                margin: 0 24px;
-            }
-            .reddit-search input {
-                width: 100%;
-                border-radius: 20px;
-                border: none;
-                padding: 7px 16px;
-                background: #272729;
-                color: #fff;
-            }
-            .reddit-user {
-                display: flex; align-items: center;
-                gap: 10px;
-                margin-right: 24px;
-            }
-            .reddit-user .bi-person-circle {
-                font-size: 1.5rem;
-            }
+
             .main-content {
                 padding-top: calc(var(--header-height) + 2rem);
-                padding-right: 2rem;
-                padding-left: 2rem;
-                min-height: 100vh;
+                padding: 2rem;
+                max-width: 600px;
+                margin: 0 auto;
             }
-            .list-group-item {
-                background: #181819;
-                border: 1px solid #232324;
-                border-radius: 10px !important;
-                margin-bottom: 10px;
-                color: #fff;
-            }
-            .list-group-item:hover {
-                background: #232324;
-                color: #fff;
-            }
-            .btn-click-dark {
-                background: #333;
-                color: #fff !important;
-                border: none;
-                border-radius: 20px;
-                padding: 6px 18px;
-                font-weight: 500;
-                font-size: 1rem;
-                transition: background 0.2s;
-                margin-right: 0.3rem;
-            }
-            .btn-click-dark:hover {
-                background: #222;
-                color: #fff !important;
-            }
-            .badge {
-                padding: 6px 12px;
-                border-radius: 6px;
-                font-weight: 500;
-                letter-spacing: 0.3px;
-                font-size: 0.95rem;
-            }
-            .badge.bg-primary {
-                background: var(--reddit-orange) !important;
-                color: #fff !important;
-            }
-            .badge.bg-secondary {
-                background: var(--reddit-gray) !important;
-                color: #fff !important;
-            }
-            .welcome-section {
+
+            .welcome-card {
+                background: var(--card-bg);
+                border-radius: 16px;
+                padding: 2rem;
+                margin-bottom: 2rem;
+                border: 1px solid var(--border-color);
                 text-align: center;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+                font-weight: 700;
+                margin-bottom: 1rem;
+                color: var(--text-primary);
+            }
+
+            .welcome-text {
+                color: var(--text-secondary);
+                font-size: 1.1rem;
                 margin-bottom: 2rem;
             }
-            .welcome-section h1 {
-                color: var(--reddit-orange);
-                font-weight: 700;
-                letter-spacing: -0.5px;
+
+            .user-select-card {
+                background: var(--card-bg);
+                border-radius: 16px;
+                padding: 2rem;
+                border: 1px solid var(--border-color);
             }
-            .welcome-section .lead {
-                color: #bbb;
+
+            .user-select-title {
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+                color: var(--text-primary);
             }
+
+            .form-control {
+                background: var(--background-color);
+                border: 1px solid var(--border-color);
+                color: var(--text-primary);
+                padding: 12px;
+                border-radius: 12px;
+                margin-bottom: 1rem;
+            }
+
+            .form-control:focus {
+                background: var(--background-color);
+                border-color: var(--primary-color);
+                color: var(--text-primary);
+                box-shadow: 0 0 0 2px rgba(29, 161, 242, 0.2);
+            }
+
+            .btn-primary {
+                background: var(--primary-color);
+                border: none;
+                padding: 12px 24px;
+                border-radius: 30px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                width: 100%;
+            }
+
+            .btn-primary:hover {
+                background: #1a91da;
+                transform: translateY(-2px);
+            }
+
+            .alert {
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
+                color: var(--text-primary);
+                border-radius: 12px;
+                margin-bottom: 1.5rem;
+            }
+
+            .alert-success {
+                border-color: #28a745;
+            }
+
+            .alert-danger {
+                border-color: #dc3545;
+            }
+
+            .user-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .user-item {
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                transition: all 0.3s ease;
+            }
+
+            .user-item:hover {
+                transform: translateY(-2px);
+                border-color: var(--primary-color);
+            }
+
+            .user-info {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
             .user-avatar {
-                width:40px;
-                height:40px;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                background: var(--reddit-gray-dark);
-                border-radius:50%;
-                color:var(--reddit-orange);
+                width: 48px;
+                height: 48px;
+                background: var(--primary-color);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
                 font-size: 1.5rem;
             }
-            @media (max-width: 900px) {
+
+            .user-details {
+                flex: 1;
+            }
+
+            .user-name {
+                font-weight: 600;
+                font-size: 1.1rem;
+                color: var(--text-primary);
+                margin: 0;
+            }
+
+            .user-role {
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+                margin: 0;
+            }
+
+            @media (max-width: 768px) {
                 .main-content {
-                    padding-left: 1rem;
-                    padding-right: 1rem;
+                    padding: 1rem;
+                }
+                .welcome-card, .user-select-card {
+                    padding: 1.5rem;
                 }
             }
-            .input-group.mb-4 {
-                background: #fff;
-                border-radius: 20px;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-                padding: 2px 6px;
+
+            .main-content.centered-welcome {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding-top: 0;
+                max-width: 700px;
             }
-            .input-group.mb-4 .input-group-text {
-                background: #fff;
-                border: none;
-                color: #333;
-            }
-            .input-group.mb-4 .bi-search {
-                color: #333 !important;
-            }
-            .input-group.mb-4 .form-control {
-                background: #fff !important;
-                color: #232324 !important;
-                border: none;
-                border-radius: 20px;
-                font-weight: 500;
-            }
-            .input-group.mb-4 .form-control::placeholder {
-                color: #888 !important;
-                opacity: 1;
-            }
-            .form-label {
-                color: #fff;
-                font-weight: 500;
-            }
-            .form-select {
-                background: #232324 !important;
-                color: #fff !important;
-                border: 1.5px solid #333;
-                border-radius: 12px;
-                font-size: 1.1rem;
-                font-weight: 500;
-                box-shadow: none;
-                transition: border-color 0.2s;
-            }
-            .form-select:focus {
-                border-color: var(--reddit-orange);
-                box-shadow: 0 0 0 0.15rem rgba(255,69,0,0.15);
-                background: #232324 !important;
-                color: #fff !important;
-            }
-            .form-select option {
-                background: #232324;
-                color: #fff;
-            }
-            .form-select option[disabled], .form-select option[value=""] {
-                color: #bbb;
+
+            .centered-welcome .welcome-card {
+                margin-top: 80px;
             }
         </style>
     </head>
     <body>
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header text-center">
-                            <h1 class="mb-4" style="color: var(--reddit-orange);">Bienvenido a Click</h1>
-                            <p class="lead mb-0">Selecciona un usuario para comenzar</p>
-                        </div>
-                        <div class="card-body">
-                            <form method="post" class="mb-4">
-                                <div class="list-group" id="listaUsuarios">
-                                    <?php foreach($usuarios as $usuario): ?>
-                                        <div class="list-group-item usuario-item d-flex justify-content-between align-items-center" style="background:#232324; color:#fff; border:1px solid #333; border-radius:10px; margin-bottom:10px;">
-                                            <div class="d-flex align-items-center">
-                                                <div class="user-avatar me-3" style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;background:#333;border-radius:50%;color:var(--reddit-orange);">
-                                                    <i class="bi bi-person-circle fs-4"></i>
-                                                </div>
-                                                <div class="user-info">
-                                                    <h6 class="mb-0" style="color:#fff;font-weight:600;">
-                                                        <?php echo htmlspecialchars($usuario['nombre']); ?>
-                                                    </h6>
-                                                    <span class="badge <?php echo $usuario['rol'] === 'admin' ? 'bg-primary' : 'bg-secondary'; ?>" style="margin-left:2px;">
-                                                        <?php echo htmlspecialchars($usuario['rol']); ?>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                            <form method="post" class="d-inline">
-                                                <input type="hidden" name="usuario_id" value="<?php echo $usuario['id_usuario']; ?>">
-                                                <input type="hidden" name="usuario_nombre" value="<?php echo htmlspecialchars($usuario['nombre']); ?>">
-                                                <input type="hidden" name="usuario_rol" value="<?php echo htmlspecialchars($usuario['rol']); ?>">
-                                                <button type="submit" name="seleccionar_usuario" class="btn btn-click">
-                                                    <i class="bi bi-box-arrow-in-right me-2"></i>
-                                                    Seleccionar
-                                                </button>
-                                            </form>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+        <header class="app-header">
+            <a href="index.php" class="app-logo">
+                <i class="bi bi-chat-dots-fill" style="color: var(--primary-color); font-size: 1.8rem;"></i>
+                <h1 class="app-title">Click</h1>
+            </a>
+        </header>
+
+        <main class="main-content<?php if (!$usuario_actual) echo ' centered-welcome'; ?>">
+            <?php if (!empty($mensaje)): ?>
+                <div class="alert alert-<?php echo $tipo_mensaje; ?> alert-dismissible fade show" role="alert">
+                    <?php echo htmlspecialchars($mensaje); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
+            <?php endif; ?>
+
+            <?php if (!$usuario_actual): ?>
+                <div class="welcome-card">
+                    <h2 class="welcome-title">Bienvenido a Click</h2>
+                    <p class="welcome-text">Selecciona un usuario para comenzar a interactuar</p>
+                </div>
+            <?php else: ?>
+                <div class="welcome-card">
+                    <h2 class="welcome-title">¡Hola, <?php echo htmlspecialchars($usuario_actual['nombre']); ?>!</h2>
+                    <p class="welcome-text">Bienvenido de nuevo a Click</p>
+                    <a href="index.php?view=publicacion" class="btn btn-primary">
+                        <i class="bi bi-house-door-fill"></i> Ir a Publicaciones
+                    </a>
+                </div>
+            <?php endif; ?>
+
+            <div class="user-select-card">
+                <h3 class="user-select-title">Selecciona tu usuario</h3>
+                <?php foreach($usuarios as $usuario): ?>
+                    <form method="post" class="user-list" style="margin-bottom:0;">
+                        <div class="user-item">
+                            <div class="user-info">
+                                <div class="user-avatar">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <div class="user-details">
+                                    <h4 class="user-name"><?php echo htmlspecialchars($usuario['nombre']); ?></h4>
+                                    <p class="user-role"><?php echo htmlspecialchars($usuario['rol']); ?></p>
+                                </div>
+                                <?php if ($usuario_actual && $usuario_actual['id'] == $usuario['id_usuario']): ?>
+                                    <button type="button" class="btn btn-primary" disabled>Actual</button>
+                                <?php else: ?>
+                                    <button type="submit" name="seleccionar_usuario" class="btn btn-primary">
+                                        Seleccionar
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                            <input type="hidden" name="usuario_id" value="<?php echo $usuario['id_usuario']; ?>">
+                            <input type="hidden" name="usuario_nombre" value="<?php echo htmlspecialchars($usuario['nombre']); ?>">
+                            <input type="hidden" name="usuario_rol" value="<?php echo htmlspecialchars($usuario['rol']); ?>">
+                        </div>
+                    </form>
+                <?php endforeach; ?>
             </div>
-        </div>
+        </main>
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     </body>
     </html>
@@ -489,26 +529,29 @@ if (!isset($_GET['view']) || $_GET['view'] === 'index') {
                 }
                 $respuestas = $controllerComentario->obtenerRespuestasAnidadas($_GET['parent_id']);
                 foreach ($respuestas as $respuesta) {
-                    echo '<div class="comentario-box" id="comentario-' . $respuesta['id_comentario'] . '">';
+                    $usuario_nombre_js = addslashes(htmlspecialchars($respuesta['nombre_usuario'], ENT_QUOTES, 'UTF-8'));
+                    echo '<div class="comentario-card respuesta" id="comentario-' . $respuesta['id_comentario'] . '">';
                     echo '<div class="comentario-header">';
-                    echo '<i class="bi bi-person-circle me-2"></i>';
-                    echo '<span class="autor">' . htmlspecialchars($respuesta['nombre_usuario']) . '</span>';
-                    echo '<span class="tiempo">' . $respuesta['fecha_comentario'] . '</span>';
+                    echo '<div class="comentario-avatar"><i class="bi bi-person-fill"></i></div>';
+                    echo '<div class="comentario-info">';
+                    echo '<span class="comentario-autor">' . htmlspecialchars($respuesta['nombre_usuario']) . '</span>';
+                    echo '<span class="comentario-tiempo">' . $respuesta['fecha_comentario'] . '</span>';
+                    echo '</div>';
                     echo '</div>';
                     echo '<div class="comentario-contenido">' . mostrarAt($respuesta['comentario'], $usuario_actual['nombre']) . '</div>';
                     echo '<div class="comentario-acciones">';
-                    echo '<button type="button" class="btn btn-link btn-responder p-0" onclick="mostrarFormularioRespuesta(' . $respuesta['id_comentario'] . ', \'' . addslashes(htmlspecialchars($respuesta['nombre_usuario'], ENT_QUOTES, 'UTF-8')) . '\', true)"><i class="bi bi-reply"></i> <span>Responder</span></button>';
+                    echo '<button type="button" class="comentario-btn" onclick="mostrarFormularioRespuesta(' . $respuesta['id_comentario'] . ', \'' . $usuario_nombre_js . '\', true)"><i class="bi bi-reply"></i> Responder</button>';
+                    echo '<button type="button" class="comentario-btn" onclick="toggleRespuestas(' . $respuesta['id_comentario'] . ')"><i class="bi bi-chat-dots"></i> Ver respuestas</button>';
                     if (puedeEliminarComentario($respuesta, $usuario_actual, $publicacion)) {
-                        echo '<button type="button" class="btn btn-danger btn-sm ms-2" onclick="eliminarComentario(' . $respuesta['id_comentario'] . ')"><i class="bi bi-trash"></i> <span>Eliminar</span></button>';
+                        echo '<button type="button" class="comentario-btn text-danger" onclick="eliminarComentario(' . $respuesta['id_comentario'] . ')"><i class="bi bi-trash"></i> Eliminar</button>';
                     }
                     echo '</div>';
                     // Formulario oculto para responder a la respuesta
                     echo '<form method="post" action="index.php?view=comentario&id_publicacion=' . $id_publicacion . '" class="mt-2 respuesta-form" id="respuesta-form-' . $respuesta['id_comentario'] . '" style="display:none;">';
-                    echo '<div class="form-group">';
-                    echo '<textarea class="form-control" name="comentario" rows="2" placeholder="Responder a ' . htmlspecialchars($respuesta['nombre_usuario']) . '..." required></textarea>';
-                    echo '</div>';
-                    echo '<div class="d-flex justify-content-end mt-2">';
-                    echo '<button type="submit" class="btn btn-click">Responder</button>';
+                    echo '<div class="d-flex align-items-start gap-3">';
+                    echo '<div class="comentario-avatar"><i class="bi bi-person-fill"></i></div>';
+                    echo '<textarea class="form-control me-2" name="comentario" rows="2" placeholder="Responder a ' . htmlspecialchars($respuesta['nombre_usuario']) . '..." required></textarea>';
+                    echo '<button type="submit" class="btn btn-primary">Responder</button>';
                     echo '</div>';
                     echo '<input type="hidden" name="parent_id" value="' . $respuesta['id_comentario'] . '">';
                     echo '<input type="hidden" name="id_publicacion" value="' . $id_publicacion . '">';
